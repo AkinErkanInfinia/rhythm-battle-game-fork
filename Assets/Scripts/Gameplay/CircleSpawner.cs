@@ -1,7 +1,6 @@
-using System;
 using System.Collections;
+using Managers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Gameplay
@@ -10,13 +9,17 @@ namespace Gameplay
     {
         public Player player;
         public float defenceSeconds;
+        public GameObject circleCollectedVFXRed;
+        public GameObject circleCollectedVFXBlue;
+        public GameObject circleSentVFXRed;
+        public GameObject circleSentVFXBlue;
         
         private bool _isDefending;
-        private Image _spawnerImage;
+        private GameObject _circle;
 
         private void Start()
-        {
-            _spawnerImage = GetComponent<Image>();
+        { 
+            _circle = transform.Find("Circle").gameObject;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -25,6 +28,13 @@ namespace Gameplay
 
             if (other.TryGetComponent<Circle>(out var circle))
             {
+                var prefab = player.playerSide == PlayerSide.Blue ? circleCollectedVFXBlue : circleCollectedVFXRed;
+                var particle = Instantiate(prefab, transform.position, Quaternion.identity);
+                var pos = particle.transform.position;
+                particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
+                Destroy(particle, 1f);
+                
+                GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
                 player.CircleCollected();
             }
@@ -48,6 +58,14 @@ namespace Gameplay
             var circle = Instantiate(player.circlePrefab, transform).GetComponent<Circle>();
             circle.transform.localPosition = Vector3.zero;
             circle.dir = player.GetDirectionVector();
+            
+            GameManager.SpawnedCircles.Add(circle.gameObject);
+            
+            var prefab = player.playerSide == PlayerSide.Blue ? circleSentVFXBlue : circleSentVFXRed;
+            var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
+            var pos = particle.transform.position;
+            particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
+            Destroy(particle, 1f);
         }
 
         private void Defend()
@@ -60,9 +78,9 @@ namespace Gameplay
         private IEnumerator DefendCoroutine()
         {
             _isDefending = true;
-            _spawnerImage.color = Color.black;
+            _circle.SetActive(true);
             yield return new WaitForSeconds(defenceSeconds);
-            _spawnerImage.color = Color.white;
+            _circle.SetActive(false);
             _isDefending = false;
         }
     }

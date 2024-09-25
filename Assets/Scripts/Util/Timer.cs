@@ -5,14 +5,20 @@ using UnityEngine;
 
 namespace Util
 {
+    public enum TimerType
+    {
+        RoundEnd,
+        GetReady
+    }
+    
     public class Timer : MonoBehaviour
     {
-        public TextMeshProUGUI timerText;
-        
+        private TextMeshProUGUI _timerText;
         private float _timeRemaining;
         private bool _isTimerRunning;
+        private TimerType _currentTimerType;
 
-        public static event Action TimeIsUp;
+        public static event Action<TimerType> TimeIsUp;
 
         private void Update()
         {
@@ -21,20 +27,22 @@ namespace Util
             if (_timeRemaining > 0)
             {
                 _timeRemaining -= Time.deltaTime;
-                timerText.text = (Mathf.FloorToInt(_timeRemaining) + 1).ToString();
+                _timerText.text = (Mathf.FloorToInt(_timeRemaining) + 1).ToString();
             }
             else
             {
                 _timeRemaining = 0;
                 _isTimerRunning = false;
-                TimeIsUp?.Invoke();
+                TimeIsUp?.Invoke(_currentTimerType);
             }
         }
 
-        public void StartTimer(float startFrom)
+        public void StartTimer(float startFrom, TextMeshProUGUI targetText, TimerType type)
         {
+            _timerText = targetText;
             _timeRemaining = startFrom;
             _isTimerRunning = true;
+            _currentTimerType = type;
         }
     }
 }
