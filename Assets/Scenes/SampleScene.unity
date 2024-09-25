@@ -1098,6 +1098,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 005d4906f14243247b92f0894ba6c5ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  players:
+  - {fileID: 685219565}
+  - {fileID: 1818863284}
   roundTime: 5
   timer: {fileID: 1153037734}
 --- !u!4 &1186103390
