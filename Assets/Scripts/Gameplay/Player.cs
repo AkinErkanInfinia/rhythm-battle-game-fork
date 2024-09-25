@@ -1,5 +1,7 @@
 using System;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gameplay
 {
@@ -9,22 +11,23 @@ namespace Gameplay
         Defender
     }
 
-    public enum AttackDirection
+    public enum PlayerSide
     {
-        Right,
-        Left
+        Blue,
+        Red
     }
     
     public class Player : MonoBehaviour
     {
         public GameObject circlePrefab;
         public PlayerType playerType;
-        public AttackDirection attackDirection;
+        public PlayerSide playerSide;
         public int missedCircleCount;
         public int collectedCircleCount;
+        public TextMeshProUGUI missedCircleText;
+        public TextMeshProUGUI collectedCircleText;
 
         // Add inactivity penalty
-        
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.TryGetComponent<CircleSpawner>(out var spawner))
@@ -35,10 +38,10 @@ namespace Gameplay
 
         public Vector3 GetDirectionVector()
         {
-            return attackDirection switch
+            return playerSide switch
             {
-                AttackDirection.Left => Vector3.left,
-                AttackDirection.Right => Vector3.right,
+                PlayerSide.Red => Vector3.right,
+                PlayerSide.Blue => Vector3.left,
                 _ => Vector3.zero
             };
         }
@@ -46,11 +49,13 @@ namespace Gameplay
         public void CircleMissed()
         {
             missedCircleCount++;
+            missedCircleText.text = missedCircleCount.ToString();
         }
 
         public void CircleCollected()
         {
             collectedCircleCount++;
+            collectedCircleText.text = collectedCircleCount.ToString();
         }
     }
     

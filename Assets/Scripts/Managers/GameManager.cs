@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using Gameplay;
+using TMPro;
 using UnityEngine;
 using Util;
 
@@ -8,7 +11,17 @@ namespace Managers
     {
         public Player[] players;
         public float roundTime;
+        public float betweenRoundsTime;
         public Timer timer;
+        public GameObject playersCanvas;
+        public GameObject popupObject;
+        public TextMeshProUGUI popupTitle;
+        public TextMeshProUGUI popupCountdown;
+        public TextMeshProUGUI timerText;
+        public GameObject endScreenPopup;
+        public TextMeshProUGUI endScreenTitle;
+
+        public static List<GameObject> SpawnedCircles;
 
         private int _round;
         private int _leftSideMissedCircles;
@@ -17,12 +30,15 @@ namespace Managers
         private void Start()
         {
             Timer.TimeIsUp += OnTimeIsUp;
-            
-            NextRound();
+
+            SpawnedCircles = new List<GameObject>();
+            StartCoroutine(NextRound());
         }
 
-        private void OnTimeIsUp()
+        private void OnTimeIsUp(TimerType type)
         {
+            if (type == TimerType.GetReady) { return; }
+            
             Debug.Log("Time is up!");
             if (_round == 2)
             {
@@ -31,14 +47,26 @@ namespace Managers
             else
             {
                 SwapRoles();
-                NextRound();
+                StartCoroutine(NextRound());
             }
         }
 
-        private void NextRound()
+        private IEnumerator NextRound()
         {
             _round++;
-            timer.StartTimer(roundTime);
+            
+            var title = _round == 1 ? "Get Ready!" : "Next Round!";
+            popupObject.SetActive(true);
+            popupTitle.text = title;
+            
+            ClearAllCirclesOnTheBoard();
+            playersCanvas.SetActive(false);
+            timer.StartTimer(betweenRoundsTime, popupCountdown, TimerType.GetReady);
+            yield return new WaitForSeconds(betweenRoundsTime);
+            popupObject.SetActive(false);
+            playersCanvas.SetActive(true);
+            
+            timer.StartTimer(roundTime, timerText, TimerType.RoundEnd);
         }
 
         private void SwapRoles()
@@ -56,9 +84,10 @@ namespace Managers
 
         private void FinishGame()
         {
+            ClearAllCirclesOnTheBoard();
             foreach (var player in players)
             {
-                if (player.attackDirection == AttackDirection.Right)
+                if (player.playerSide == PlayerSide.Red)
                 {
                     _leftSideMissedCircles += player.missedCircleCount;
                 }
@@ -68,13 +97,22 @@ namespace Managers
                 }
             }
 
-            if (_leftSideMissedCircles > _rightSideMissedCircles)
+            var winner = _leftSideMissedCircles > _rightSideMissedCircles
+                ? "Winner is <#0041FF>BLUE</color>"
+                : "Winner is <#FF000C>RED</color>";
+            if (_leftSideMissedCircles == _rightSideMissedCircles) { winner = "Tie!"; }
+            
+            endScreenPopup.SetActive(true);
+            endScreenTitle.text = winner;
+        }
+
+        private void ClearAllCirclesOnTheBoard()
+        {
+            if (SpawnedCircles.Count == 0) { return; }
+            
+            foreach (var circle in SpawnedCircles)
             {
-                Debug.Log("Winner is right side");
-            }
-            else
-            {
-                Debug.Log("Winner is left side");
+                Destroy(circle);
             }
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using UnityEngine;
 
 namespace Gameplay
@@ -11,6 +12,7 @@ namespace Gameplay
         {
             if (other.TryGetComponent<Circle>(out var circle))
             {
+                GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
                 targetPlayer.CircleMissed();
             }
