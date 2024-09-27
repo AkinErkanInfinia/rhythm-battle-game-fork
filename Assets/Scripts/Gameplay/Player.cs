@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Util;
 
 namespace Gameplay
 {
@@ -26,6 +27,28 @@ namespace Gameplay
         public int collectedCircleCount;
         public TextMeshProUGUI missedCircleText;
         public TextMeshProUGUI collectedCircleText;
+        [HideInInspector] public bool isGameFinished;
+
+        [Header("Inactivity")]
+        [HideInInspector] public float lastAttackTime;
+        public TextMeshProUGUI inactivityText;
+        public int inactivityDamage;
+        public float inactivityLimit;
+        private bool _isInactive;
+
+        private void Update()
+        {
+            if (playerType != PlayerType.Attacker || isGameFinished) { return; }
+            
+            _isInactive = Time.time - lastAttackTime > inactivityLimit;
+            
+            if (_isInactive)
+            {
+                CircleMissed(inactivityDamage);
+                UIAnimations.InactivityTextAnimation(inactivityText);
+                lastAttackTime = Time.time;
+            }
+        }
 
         // Add inactivity penalty
         private void OnTriggerEnter2D(Collider2D other)
@@ -46,9 +69,9 @@ namespace Gameplay
             };
         }
 
-        public void CircleMissed()
+        public void CircleMissed(int count = 1)
         {
-            missedCircleCount++;
+            missedCircleCount += count;
             missedCircleText.text = missedCircleCount.ToString();
         }
 
