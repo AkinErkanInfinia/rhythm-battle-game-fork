@@ -81,7 +81,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 3c074717672d68448bc6eb125d98ccc0, type: 2}
   m_Color: {r: 0, g: 0.047058824, b: 0.7490196, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -158,3 +158,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dir: {x: 0, y: 0, z: 0}
   speed: 0.05
+  collectedSound:
+    audioClip: {fileID: 8300000, guid: 6fede028ba58b48d08e05b2bff883359, type: 3}
+    volume: 1
+  missedSound:
+    audioClip: {fileID: 8300000, guid: 1916972b0254443a2ac996968e38335c, type: 3}
+    volume: 1
+  spawnedSound:
+    audioClip: {fileID: 8300000, guid: 02f98902d77f7431cb0c64b9fe4744fc, type: 3}
+    volume: 1

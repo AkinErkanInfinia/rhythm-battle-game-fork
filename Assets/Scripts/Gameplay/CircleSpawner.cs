@@ -16,13 +16,14 @@ namespace Gameplay
         
         private bool _isDefending;
         private GameObject _circle;
+        private float _lastActivatedTime;
 
         private void Start()
         { 
             _circle = transform.Find("Circle").gameObject;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerStay2D(Collider2D other)
         {
             if (!_isDefending) { return; }
 
@@ -34,6 +35,7 @@ namespace Gameplay
                 particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
                 Destroy(particle, 1f);
                 
+                circle.PlayCollectedSound();
                 GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
                 player.CircleCollected();
@@ -42,6 +44,9 @@ namespace Gameplay
 
         public void Activate()
         {
+            if (Time.time - _lastActivatedTime < defenceSeconds) { return; }
+
+            _lastActivatedTime = Time.time;
             switch (player.playerType)
             {
                 case PlayerType.Attacker:
@@ -58,6 +63,7 @@ namespace Gameplay
             var circle = Instantiate(player.circlePrefab, transform).GetComponent<Circle>();
             circle.transform.localPosition = Vector3.zero;
             circle.dir = player.GetDirectionVector();
+            player.lastAttackTime = Time.time;
             
             GameManager.SpawnedCircles.Add(circle.gameObject);
             
@@ -65,7 +71,7 @@ namespace Gameplay
             var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
             particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
-            Destroy(particle, 1f);
+            Destroy(particle, 2f);
         }
 
         private void Defend()
