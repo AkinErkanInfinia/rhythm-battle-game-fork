@@ -16,7 +16,7 @@ namespace Util
         void Update () {
             var x = Mathf.Repeat(Time.time * scrollSpeed, 1);
             var offset = new Vector2 (x, 0);
-            _renderer.material.SetTextureOffset("_BaseMap", offset);
+            _renderer.material.SetTextureOffset("_MainTex", offset);
         }
     }
 }

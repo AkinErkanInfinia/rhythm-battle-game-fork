@@ -35,6 +35,7 @@ namespace Gameplay
                 particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
                 Destroy(particle, 1f);
                 
+                circle.PlayCollectedSound();
                 GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
                 player.CircleCollected();
@@ -70,7 +71,7 @@ namespace Gameplay
             var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
             particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
-            Destroy(particle, 1f);
+            Destroy(particle, 2f);
         }
 
         private void Defend()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
@@ -21,6 +22,10 @@ namespace Managers
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
+
+        [Space(10)] [Header("Audio")] 
+        public SoundClip prepareTimeFinished;
+        public SoundClip roundTimeFinished;
         
         [Space(10)]
         [Header("Background")]
@@ -50,16 +55,25 @@ namespace Managers
         private void Start()
         {
             Timer.TimeIsUp += OnTimeIsUp;
-
+            
             SpawnedCircles = new List<GameObject>();
             NextRound();
         }
 
+        private void OnDestroy()
+        {
+            Timer.TimeIsUp -= OnTimeIsUp;
+        }
+
         private void OnTimeIsUp(TimerType type)
         {
-            if (type == TimerType.GetReady) { return; }
+            if (type == TimerType.GetReady)
+            {
+                AudioManager.Instance.PlaySoundFXClip(prepareTimeFinished, transform);
+                return;
+            }
             
-            Debug.Log("Time is up!");
+            AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
             if (_round == 2)
             {
                 FinishGame();

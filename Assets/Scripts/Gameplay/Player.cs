@@ -1,4 +1,5 @@
 using System;
+using Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -27,6 +28,7 @@ namespace Gameplay
         public int collectedCircleCount;
         public TextMeshProUGUI missedCircleText;
         public TextMeshProUGUI collectedCircleText;
+        public SoundClip inactivitySound;
         [HideInInspector] public bool isGameFinished;
 
         [Header("Inactivity")]
@@ -44,6 +46,7 @@ namespace Gameplay
             
             if (_isInactive)
             {
+                AudioManager.Instance.PlaySoundFXClip(inactivitySound, transform);
                 CircleMissed(inactivityDamage);
                 UIAnimations.InactivityTextAnimation(inactivityText);
                 lastAttackTime = Time.time;

@@ -36,5 +36,16 @@ namespace Util
             await UniTask.WaitForSeconds(1f);
             await text.transform.DOScale(0, 0.5f).SetEase(Ease.OutFlash).ToUniTask();
         }
+
+        public static async void LogoSplashAnimation(Image bg, Image logo)
+        {
+            logo.transform.DOScale(1f, 1.5f).SetEase(Ease.OutBounce).ToUniTask();
+            logo.transform.DOPunchRotation(new Vector3(0, 0, 45f), 1f).ToUniTask();
+            await UniTask.WaitForSeconds(3);
+            bg.DOFade(0, 1f).ToUniTask();
+            await logo.DOFade(0, 1f).ToUniTask();
+            bg.gameObject.SetActive(false);
+            logo.gameObject.SetActive(false);
+        }
     }
 }

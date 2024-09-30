@@ -25,6 +25,7 @@ namespace Gameplay
             {
                 PlayHitVfx(other.ClosestPoint(transform.position));
                 
+                circle.PlayMissedSound();
                 GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
                 targetPlayer.CircleMissed();
