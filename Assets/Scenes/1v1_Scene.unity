@@ -13799,7 +13799,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   circlePrefab: {fileID: 7893084201202174423, guid: af8d1d912894b0f428fe3751b04d2475, type: 3}
-  playerType: 1
+  playerType: 0
   playerSide: 0
   missedCircleCount: 0
   collectedCircleCount: 0

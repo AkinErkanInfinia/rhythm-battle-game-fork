@@ -11,6 +11,7 @@ namespace Gameplay
         public SoundClip collectedSound;
         public SoundClip missedSound;
         public SoundClip spawnedSound;
+        public GameObject destroyedVFX;
 
         private void Start()
         {
@@ -20,6 +21,15 @@ namespace Gameplay
         private void Update()
         {
             transform.position += dir * (speed * 100f * Time.deltaTime);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!other.CompareTag("Circle")) return;
+            
+            var particle = Instantiate(destroyedVFX, gameObject.transform.position, Quaternion.identity);
+            Destroy(particle, 1.5f);
+            Destroy(gameObject);
         }
 
         public void PlayCollectedSound()

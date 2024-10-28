@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8288889836348347257}
   m_Layer: 5
   m_Name: CircleBlue
-  m_TagString: Untagged
+  m_TagString: Circle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -167,3 +167,4 @@ MonoBehaviour:
   spawnedSound:
     audioClip: {fileID: 8300000, guid: 02f98902d77f7431cb0c64b9fe4744fc, type: 3}
     volume: 1
+  destroyedVFX: {fileID: 1940802735183900513, guid: b5814c0332b699945928a1239bc7a86f, type: 3}
