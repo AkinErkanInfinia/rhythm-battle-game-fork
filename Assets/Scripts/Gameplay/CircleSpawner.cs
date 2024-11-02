@@ -38,7 +38,6 @@ namespace Gameplay
                 circle.PlayCollectedSound();
                 GameManager.SpawnedCircles.Remove(circle.gameObject);
                 Destroy(circle.gameObject);
-                player.CircleCollected();
             }
         }
 
@@ -63,6 +62,7 @@ namespace Gameplay
             var circle = Instantiate(player.circlePrefab, transform).GetComponent<Circle>();
             circle.transform.localPosition = Vector3.zero;
             circle.dir = player.GetDirectionVector();
+            circle.sender = player;
             player.lastAttackTime = Time.time;
             
             GameManager.SpawnedCircles.Add(circle.gameObject);

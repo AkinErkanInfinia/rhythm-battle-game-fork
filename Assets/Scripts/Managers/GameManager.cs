@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Gameplay;
+using Gameplay.LevelMechanics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +17,10 @@ namespace Managers
         [Header("Settings")]
         public float roundTime;
         public float betweenRoundsTime;
+        public int collisionPoint;
+        public int normalDamagePoint;
+        public int missileDamagePoint;
+        public int inactivityPenaltyPoint;
         
         [Space(10)]
         [Header("References")]
@@ -22,6 +28,7 @@ namespace Managers
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
+        public LevelMechanicBase[] mechanics;
 
         [Space(10)] [Header("Audio")] 
         public SoundClip prepareTimeFinished;
@@ -49,15 +56,53 @@ namespace Managers
         public static List<GameObject> SpawnedCircles;
 
         private int _round;
-        private int _leftSideMissedCircles;
-        private int _rightSideMissedCircles;
+        private int _redTotalScore;
+        private int _blueTotalScore;
+        private bool _isRoundStarted;
         
         private void Start()
         {
             Timer.TimeIsUp += OnTimeIsUp;
+            GameBoundCollider.NormalDamageTaken += OnNormalDamageTaken;
+            GameBoundCollider.MissileDamageTaken += OnMissileDamageTaken;
+            Player.InactivityActivated += OnInactivityActivated;
+            Circle.CirclesCollided += OnCirclesCollided;
             
             SpawnedCircles = new List<GameObject>();
             NextRound();
+        }
+
+        private void Update()
+        {
+            if (_isRoundStarted)
+            {
+                CheckMechanicsLoop(timer.GetCurrentGameTime());
+            }
+        }
+
+        private void OnCirclesCollided(Player sender)
+        {
+            sender.AddScore(collisionPoint);
+        }
+
+        private void OnInactivityActivated(Player sender)
+        {
+            sender.DecreaseScore(inactivityPenaltyPoint);
+        }
+
+        private void OnNormalDamageTaken(Player sender)
+        {
+            GetOpponentOf(sender).AddScore(normalDamagePoint);
+        }
+
+        private void OnMissileDamageTaken(Player sender)
+        {
+            GetOpponentOf(sender).AddScore(missileDamagePoint);
+        }
+
+        private Player GetOpponentOf(Player player)
+        {
+            return players.FirstOrDefault(p => p.playerSide != player.playerSide);
         }
 
         private void OnDestroy()
@@ -74,20 +119,14 @@ namespace Managers
             }
             
             AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
-            if (_round == 2)
-            {
-                FinishGame();
-            }
-            else
-            {
-                SwapRoles();
-                NextRound();
-            }
+            if (_round == 5) { FinishGame(); }
+            else { NextRound(); }
         }
 
         private async void NextRound()
         {
             _round++;
+            _isRoundStarted = false;
             
             var title = _round == 1 ? "Get Ready!" : "Next Round!";
             popupTitle.text = title;
@@ -102,8 +141,20 @@ namespace Managers
             UIAnimations.PopupFadeOut(popupObject.GetComponent<Image>(), popupBg, 1f);
             playersCanvas.SetActive(true);
             timer.StartTimer(roundTime, timerText, TimerType.RoundEnd);
-
+            
             ResetAttackTime();
+            _isRoundStarted = true;
+        }
+
+        private void CheckMechanicsLoop(int time)
+        {
+            foreach (var mechanic in mechanics)
+            {
+                if (mechanic.activateMechanicAfterRound <= _round)
+                {
+                    mechanic.MechanicLoop(time);
+                }
+            }
         }
 
         private void SwapRoles()
@@ -135,20 +186,20 @@ namespace Managers
             {
                 if (player.playerSide == PlayerSide.Red)
                 {
-                    _leftSideMissedCircles += player.missedCircleCount;
+                    _redTotalScore += player.totalScore;
                 }
                 else
                 {
-                    _rightSideMissedCircles += player.missedCircleCount;
+                    _blueTotalScore += player.totalScore;
                 }
 
                 player.isGameFinished = true;
             }
 
-            var winner = _leftSideMissedCircles > _rightSideMissedCircles
+            var winner = _blueTotalScore > _redTotalScore
                 ? "Winner is <#0041FF>BLUE</color>"
                 : "Winner is <#FF000C>RED</color>";
-            if (_leftSideMissedCircles == _rightSideMissedCircles) { winner = "Tie!"; }
+            if (_blueTotalScore == _redTotalScore) { winner = "Tie!"; }
             
             endScreenTitle.text = winner;
             UIAnimations.PopupFadeIn(endScreenPopup.GetComponent<Image>(), endScreenBg, 1f);

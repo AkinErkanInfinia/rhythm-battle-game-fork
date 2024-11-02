@@ -673,7 +673,7 @@ PlayerSettings:
     PS5: DOTWEEN
     QNX: DOTWEEN
     Stadia: DOTWEEN
-    Standalone: DOTWEEN;UNITASK_DOTWEEN_SUPPORT
+    Standalone: DOTWEEN;UNITASK_DOTWEEN_SUPPORT;XMSListener
     VisionOS: DOTWEEN
     WebGL: DOTWEEN;UNITASK_DOTWEEN_SUPPORT
     Windows Store Apps: DOTWEEN
