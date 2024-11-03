@@ -6,8 +6,9 @@ namespace Gameplay.LevelMechanics
 {
     public class Missile : MonoBehaviour
     {
-        public Vector2 startPoint;
-        public Vector2 destinationPoint;
+        public GameObject hitEffect;
+        [HideInInspector] public Vector2 startPoint;
+        [HideInInspector] public Vector2 destinationPoint;
         
         private Vector2 _middlePoint;
         private bool _startedMove;
@@ -29,6 +30,11 @@ namespace Gameplay.LevelMechanics
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (!other.CompareTag("GameBound")) { return; }
+            
+            var effect = Instantiate(hitEffect, transform.parent.transform);
+            effect.transform.position = transform.position;
+            Destroy(effect, 1f);
             Destroy(gameObject, 0.1f);
         }
 

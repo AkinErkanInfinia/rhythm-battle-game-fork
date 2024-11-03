@@ -5034,6 +5034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb16baf3b84094eb628c654a0f0075, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitEffect: {fileID: 5211219537310847859, guid: c1f0d5bbc7e2c0a4abf9d8bdb7472112, type: 3}
   startPoint: {x: 0, y: 0}
   destinationPoint: {x: 0, y: 0}
 --- !u!61 &5317126002877277856
@@ -5065,7 +5066,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.0053682476, y: 0.00042802468}

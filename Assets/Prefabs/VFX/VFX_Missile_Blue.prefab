@@ -5027,6 +5027,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb16baf3b84094eb628c654a0f0075, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitEffect: {fileID: 4327484914388989336, guid: 9bf3f52cf53b14f44a6fe22f9698aa18, type: 3}
   startPoint: {x: 0, y: 0}
   destinationPoint: {x: 0, y: 0}
 --- !u!61 &8938870802404393831
