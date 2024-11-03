@@ -44,5 +44,12 @@ namespace Util
             _isTimerRunning = true;
             _currentTimerType = type;
         }
+
+        public int GetCurrentGameTime()
+        {
+            if (_currentTimerType != TimerType.RoundEnd) { return 0; }
+            
+            return Mathf.FloorToInt(_timeRemaining) + 1;
+        }
     }
 }
