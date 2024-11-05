@@ -6,25 +6,36 @@ namespace Gameplay.LevelMechanics
     public class MissileMechanic : LevelMechanicBase
     {
         public GameObject circlePrefab;
-        public float spawnEverySeconds;
+        public float minSpawnTime;
+        public float maxSpawnTime;
+        public bool spawnOnlyOnce;
 
+        private float _spawnTimer;
+        private float _lastSpawnTime;
         private bool _isSpawned;
         
         public override void MechanicLoop(int currentGameTime)
         {
-            if (currentGameTime % spawnEverySeconds != 0 || _isSpawned) { return; }
+            if (CanSpawn())
+            {
+                _lastSpawnTime = Time.time;
+                _spawnTimer = Random.Range(minSpawnTime, maxSpawnTime);
+                SpawnMissileCircle();
+            }
+        }
 
+        private void SpawnMissileCircle()
+        {
+            _isSpawned = true;
             var pos = GetRandomPosition();
             var circle = Instantiate(circlePrefab, spawnParent.transform);
             circle.transform.localPosition = new Vector3(pos.x, pos.y, 0);
-            SpawnDelay();
         }
 
-        private async void SpawnDelay()
+        private bool CanSpawn()
         {
-            _isSpawned = true;
-            await UniTask.WaitForSeconds(1);
-            _isSpawned = false;
+            if (spawnOnlyOnce && _isSpawned) { return false; }
+            return Time.time - _lastSpawnTime > _spawnTimer;
         }
 
         private Vector2 GetRandomPosition()

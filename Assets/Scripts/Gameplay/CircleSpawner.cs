@@ -1,44 +1,25 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using Managers;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Gameplay
 {
     public class CircleSpawner : MonoBehaviour
     {
-        public Player player;
+        public Team team;
         public float defenceSeconds;
-        public GameObject circleCollectedVFXRed;
-        public GameObject circleCollectedVFXBlue;
         public GameObject circleSentVFXRed;
         public GameObject circleSentVFXBlue;
         
-        private bool _isDefending;
         private GameObject _circle;
         private float _lastActivatedTime;
+        private BoxCollider2D _boxCollider;
+        private ParticleSystem _particle;
 
         private void Start()
         { 
-            _circle = transform.Find("Circle").gameObject;
-        }
-
-        private void OnTriggerStay2D(Collider2D other)
-        {
-            if (!_isDefending) { return; }
-
-            if (other.TryGetComponent<Circle>(out var circle))
-            {
-                var prefab = player.playerSide == PlayerSide.Blue ? circleCollectedVFXBlue : circleCollectedVFXRed;
-                var particle = Instantiate(prefab, transform.position, Quaternion.identity);
-                var pos = particle.transform.position;
-                particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
-                Destroy(particle, 1f);
-                
-                circle.PlayCollectedSound();
-                GameManager.SpawnedCircles.Remove(circle.gameObject);
-                Destroy(circle.gameObject);
-            }
+            _boxCollider = GetComponent<BoxCollider2D>();
+            _particle = GetComponentInChildren<ParticleSystem>();
         }
 
         public void Activate()
@@ -46,48 +27,33 @@ namespace Gameplay
             if (Time.time - _lastActivatedTime < defenceSeconds) { return; }
 
             _lastActivatedTime = Time.time;
-            switch (player.playerType)
-            {
-                case PlayerType.Attacker:
-                    Attack();
-                    break;
-                case PlayerType.Defender:
-                    Defend();
-                    break;
-            }
+            Attack();
         }
 
         private void Attack()
         {
-            var circle = Instantiate(player.circlePrefab, transform).GetComponent<Circle>();
+            var circle = Instantiate(team.circlePrefab, transform).GetComponent<Circle>();
             circle.transform.localPosition = Vector3.zero;
-            circle.dir = player.GetDirectionVector();
-            circle.sender = player;
-            player.lastAttackTime = Time.time;
+            circle.dir = team.GetDirectionVector();
+            circle.sender = team;
+            team.lastAttackTime = Time.time;
             
             GameManager.SpawnedCircles.Add(circle.gameObject);
             
-            var prefab = player.playerSide == PlayerSide.Blue ? circleSentVFXBlue : circleSentVFXRed;
+            var prefab = team.playerSide == PlayerSide.Blue ? circleSentVFXBlue : circleSentVFXRed;
             var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
             particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
             Destroy(particle, 2f);
         }
 
-        private void Defend()
+        public async void LockSpawner(float time)
         {
-            if (_isDefending) { return; }
-
-            StartCoroutine(DefendCoroutine());
-        }
-
-        private IEnumerator DefendCoroutine()
-        {
-            _isDefending = true;
-            _circle.SetActive(true);
-            yield return new WaitForSeconds(defenceSeconds);
-            _circle.SetActive(false);
-            _isDefending = false;
+            _boxCollider.enabled = false;
+            _particle.Play();
+            await UniTask.WaitForSeconds(time);
+            _boxCollider.enabled = true;
+            _particle.Stop();
         }
     }
     

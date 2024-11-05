@@ -14,10 +14,10 @@ namespace Gameplay
         public GameObject destroyedVFX;
         public ParticleSystem circleParticle;
 
-        [HideInInspector] public Player sender;
+        [HideInInspector] public Team sender;
         [HideInInspector] public Vector3 dir;
         
-        public static event Action<Player> CirclesCollided;
+        public static event Action<Team> CirclesCollided;
 
         private void Start()
         {
@@ -33,15 +33,22 @@ namespace Gameplay
         {
             if (!other.CompareTag("Circle")) return;
 
+            DestroyCircle();
+
+            CirclesCollided?.Invoke(sender);
+        }
+
+        public void DestroyCircle()
+        {
             speed = 0;
             GetComponent<BoxCollider2D>().enabled = false;
             circleParticle.gameObject.SetActive(false);
             var particle = Instantiate(destroyedVFX, gameObject.transform.position, Quaternion.identity);
             GetComponent<UIDissolve>().Play();
+            GameManager.SpawnedCircles.Remove(gameObject);
+            
             Destroy(particle, 1.5f);
             Destroy(gameObject, 1.5f);
-            
-            CirclesCollided?.Invoke(sender);
         }
 
         public void PlayCollectedSound()

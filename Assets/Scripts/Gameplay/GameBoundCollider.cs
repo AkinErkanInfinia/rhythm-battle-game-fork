@@ -9,14 +9,14 @@ namespace Gameplay
 {
     public class GameBoundCollider : MonoBehaviour
     {
-        public Player owner;
+        public Team owner;
         public GameObject vfxHitRed;
         public GameObject vfxHitBlue;
 
         private Image _image;
         
-        public static event Action<Player> NormalDamageTaken;
-        public static event Action<Player> MissileDamageTaken;
+        public static event Action<Team> NormalDamageTaken;
+        public static event Action<Team> MissileDamageTaken;
 
         private void Start()
         {

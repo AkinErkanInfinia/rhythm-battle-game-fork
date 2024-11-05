@@ -15,8 +15,6 @@ namespace Managers
     public class GameManager : MonoBehaviour
     {
         [Header("Settings")]
-        public float roundTime;
-        public float betweenRoundsTime;
         public int collisionPoint;
         public int normalDamagePoint;
         public int missileDamagePoint;
@@ -24,11 +22,17 @@ namespace Managers
         
         [Space(10)]
         [Header("References")]
-        public Player[] players;
+        public GameConfigReader gameConfigReader;
+        public GameObject redSpawnerParent;
+        public GameObject blueSpawnerParent;
+        public GameObject redSpawnerPrefab;
+        public GameObject blueSpawnerPrefab;
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
         public LevelMechanicBase[] mechanics;
+        public Team redTeam;
+        public Team blueTeam;
 
         [Space(10)] [Header("Audio")] 
         public SoundClip prepareTimeFinished;
@@ -54,6 +58,8 @@ namespace Managers
         public TextMeshProUGUI endScreenTitle;
 
         public static List<GameObject> SpawnedCircles;
+        public static List<GameObject> RedSpawners;
+        public static List<GameObject> BlueSpawners;
 
         private int _round;
         private int _redTotalScore;
@@ -65,10 +71,14 @@ namespace Managers
             Timer.TimeIsUp += OnTimeIsUp;
             GameBoundCollider.NormalDamageTaken += OnNormalDamageTaken;
             GameBoundCollider.MissileDamageTaken += OnMissileDamageTaken;
-            Player.InactivityActivated += OnInactivityActivated;
+            Team.InactivityActivated += OnInactivityActivated;
             Circle.CirclesCollided += OnCirclesCollided;
-            
+
             SpawnedCircles = new List<GameObject>();
+            RedSpawners = new List<GameObject>();
+            BlueSpawners = new List<GameObject>();
+            
+            CreateSpawners();
             NextRound();
         }
 
@@ -80,29 +90,47 @@ namespace Managers
             }
         }
 
-        private void OnCirclesCollided(Player sender)
+        private void CreateSpawners()
+        {
+            for (int i = 0; i < gameConfigReader.data.circleCount; i++)
+            {
+                var redSpawner = Instantiate(redSpawnerPrefab, redSpawnerParent.transform);
+                var blueSpawner = Instantiate(blueSpawnerPrefab, blueSpawnerParent.transform);
+
+                redSpawner.transform.localScale = Vector3.one * gameConfigReader.data.circleScale;
+                blueSpawner.transform.localScale = Vector3.one * gameConfigReader.data.circleScale;
+                
+                redSpawner.GetComponent<CircleSpawner>().team = redTeam;
+                blueSpawner.GetComponent<CircleSpawner>().team = blueTeam;
+                
+                RedSpawners.Add(redSpawner);
+                BlueSpawners.Add(blueSpawner);
+            }
+        }
+
+        private void OnCirclesCollided(Team sender)
         {
             sender.AddScore(collisionPoint);
         }
 
-        private void OnInactivityActivated(Player sender)
+        private void OnInactivityActivated(Team sender)
         {
             sender.DecreaseScore(inactivityPenaltyPoint);
         }
 
-        private void OnNormalDamageTaken(Player sender)
+        private void OnNormalDamageTaken(Team sender)
         {
             GetOpponentOf(sender).AddScore(normalDamagePoint);
         }
 
-        private void OnMissileDamageTaken(Player sender)
+        private void OnMissileDamageTaken(Team sender)
         {
             GetOpponentOf(sender).AddScore(missileDamagePoint);
         }
 
-        private Player GetOpponentOf(Player player)
+        private Team GetOpponentOf(Team team)
         {
-            return players.FirstOrDefault(p => p.playerSide != player.playerSide);
+            return team.playerSide == PlayerSide.Blue ? redTeam : blueTeam;
         }
 
         private void OnDestroy()
@@ -134,13 +162,13 @@ namespace Managers
 
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
-            timer.StartTimer(betweenRoundsTime, popupCountdown, TimerType.GetReady);
+            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, popupCountdown, TimerType.GetReady);
             
-            await UniTask.WaitForSeconds(betweenRoundsTime);
+            await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
             
             UIAnimations.PopupFadeOut(popupObject.GetComponent<Image>(), popupBg, 1f);
             playersCanvas.SetActive(true);
-            timer.StartTimer(roundTime, timerText, TimerType.RoundEnd);
+            timer.StartTimer(gameConfigReader.data.roundDuration, timerText, TimerType.RoundEnd);
             
             ResetAttackTime();
             _isRoundStarted = true;
@@ -157,44 +185,21 @@ namespace Managers
             }
         }
 
-        private void SwapRoles()
-        {
-            foreach (var player in players)
-            {
-                player.playerType = player.playerType switch
-                {
-                    PlayerType.Attacker => PlayerType.Defender,
-                    PlayerType.Defender => PlayerType.Attacker,
-                    _ => player.playerType
-                };
-            }
-            ChangeScrollerDirection();
-        }
-
         private void ResetAttackTime()
         {
-            foreach (var player in players)
-            {
-                player.lastAttackTime = Time.time;
-            }
+            redTeam.lastAttackTime = Time.time;
+            blueTeam.lastAttackTime = Time.time;
         }
 
         private void FinishGame()
         {
             ClearAllCirclesOnTheBoard();
-            foreach (var player in players)
-            {
-                if (player.playerSide == PlayerSide.Red)
-                {
-                    _redTotalScore += player.totalScore;
-                }
-                else
-                {
-                    _blueTotalScore += player.totalScore;
-                }
 
-                player.isGameFinished = true;
-            }
+            _redTotalScore += redTeam.totalScore;
+            _blueTotalScore += blueTeam.totalScore;
+            
+            redTeam.isGameFinished = true;
+            blueTeam.isGameFinished = true;
 
             var winner = _blueTotalScore > _redTotalScore
                 ? "Winner is <#0041FF>BLUE</color>"
