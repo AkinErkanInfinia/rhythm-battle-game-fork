@@ -1,3 +1,4 @@
+using Coffee.UIExtensions;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
@@ -14,6 +15,24 @@ namespace Util
             popup.transform.localPosition = new Vector3(0, 3500, 0);
             popup.DOAnchorPos(new Vector2(0, 0), fadeTime).SetEase(Ease.InOutQuint);
             bg.DOFade(0.85f, fadeTime);
+        }
+        
+        public static void PopupDissolveIn(GameObject bg, RectTransform content, float fadeTime)
+        {
+            var dissolve = bg.GetComponent<UIDissolve>();
+            DOTween.To(() => dissolve.effectFactor, x => dissolve.effectFactor = x, 0, fadeTime);
+            
+            content.transform.localPosition = new Vector3(0, 3500, 0);
+            content.DOAnchorPos(new Vector2(0, 0), fadeTime).SetEase(Ease.InOutQuint);
+        }
+        
+        public static void PopupDissolveOut(GameObject bg, RectTransform content, float fadeTime)
+        {
+            var dissolve = bg.GetComponent<UIDissolve>();
+            DOTween.To(() => dissolve.effectFactor, x => dissolve.effectFactor = x, 1, fadeTime);
+            
+            content.transform.localPosition = new Vector3(0, 0, 0);
+            content.DOAnchorPos(new Vector2(0, 3500), fadeTime).SetEase(Ease.InOutQuint);
         }
 
         public static void PopupFadeOut(Image bg, RectTransform popup, float fadeTime)

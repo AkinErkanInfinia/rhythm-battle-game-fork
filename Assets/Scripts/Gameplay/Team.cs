@@ -30,13 +30,13 @@ namespace Gameplay
         
         private bool _isInactive;
         private string _teamName;
+        
+        public string TeamName { get; set; }
 
         public static event Action<Team> InactivityActivated;
 
         private void Update()
         {
-            if (isGameFinished) { return; }
-            
             _isInactive = Time.time - lastAttackTime > inactivityLimit;
             
             if (_isInactive)
@@ -47,6 +47,11 @@ namespace Gameplay
                 
                 InactivityActivated?.Invoke(this);
             }
+        }
+
+        private void OnEnable()
+        {
+            lastAttackTime = Time.time;
         }
 
         public Vector3 GetDirectionVector()
@@ -74,7 +79,7 @@ namespace Gameplay
 
         public void SetTeamName(string teamName)
         {
-            _teamName = teamName;
+            TeamName = teamName;
             nameText.text = teamName;
         }
     }

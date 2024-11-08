@@ -8,6 +8,7 @@ namespace Util
         {
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 60;
+            
         }
     }
 }

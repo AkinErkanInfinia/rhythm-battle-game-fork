@@ -8,8 +8,7 @@ namespace Gameplay
     {
         public Team team;
         public float defenceSeconds;
-        public GameObject circleSentVFXRed;
-        public GameObject circleSentVFXBlue;
+        public GameObject circleSentVFX;
         
         private GameObject _circle;
         private float _lastActivatedTime;
@@ -40,8 +39,7 @@ namespace Gameplay
             
             GameManager.SpawnedCircles.Add(circle.gameObject);
             
-            var prefab = team.playerSide == PlayerSide.Blue ? circleSentVFXBlue : circleSentVFXRed;
-            var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
+            var particle = Instantiate(circleSentVFX, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
             particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
             Destroy(particle, 2f);

@@ -1,6 +1,9 @@
 using System;
+using System.Numerics;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
 using Random = UnityEngine.Random;
+using Vector2 = UnityEngine.Vector2;
 
 namespace Gameplay.LevelMechanics
 {
@@ -17,6 +20,8 @@ namespace Gameplay.LevelMechanics
         private bool _startedMove;
         private float _count;
         private MechanicType _mechanicType;
+        private Quaternion _fromRotation;
+        private Quaternion _toRotation;
         
         private void Update()
         {
@@ -25,10 +30,13 @@ namespace Gameplay.LevelMechanics
             if (_count < 1f)
             {
                 _count += Time.deltaTime * speed;
-
+                
+                var lastPos = transform.localPosition;
                 Vector2 m1 = Vector2.Lerp(startPoint, _middlePoint, _count);
                 Vector2 m2 = Vector2.Lerp(_middlePoint, destinationPoint, _count);
                 transform.localPosition = Vector2.Lerp(m1, m2, _count);
+                
+                transform.localRotation = Quaternion.Lerp(_fromRotation, _toRotation, _count);
             }
         }
 
@@ -68,10 +76,28 @@ namespace Gameplay.LevelMechanics
             _mechanicType = mechanicType;
             startPoint = start;
             destinationPoint = dest;
+            
             var dir = Random.Range(0, 2) == 0 ? Vector2.right : Vector2.left;
+            SetQuaternions(dir);
+            
             _middlePoint = startPoint + (destinationPoint - startPoint) / 2 + dir * deviation;
-
             _startedMove = true;
+        }
+
+        private void SetQuaternions(Vector2 dir)
+        {
+            var startZRotation = transform.localRotation.eulerAngles.z;
+            var rotationMultiply = startZRotation == 0 ? 1 : -1;
+            if (dir.normalized == Vector2.right)
+            {
+                _fromRotation = Quaternion.Euler(0, 0, startZRotation + -45f * rotationMultiply);
+                _toRotation = Quaternion.Euler(0, 0, startZRotation + 45f * rotationMultiply);
+            }
+            else
+            {
+                _fromRotation = Quaternion.Euler(0, 0, startZRotation + 45f * rotationMultiply);
+                _toRotation = Quaternion.Euler(0, 0, startZRotation + -45f * rotationMultiply);
+            }
         }
     }
 }

@@ -68,6 +68,7 @@ MonoBehaviour:
   disappearAfterSeconds: 5
   missile: {fileID: 1495554254716999111, guid: fd1e3dc248ca85e4a803ecbd90d47d15, type: 3}
   shootParticle: {fileID: 5862655566876586188}
+  mechanicType: 0
 --- !u!95 &5574367138282848317
 Animator:
   serializedVersion: 5
@@ -109,9 +110,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 7bb94cccccd52014f9c90048779af694, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d4115f1345667af45b1b1d7580fde0ec, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1

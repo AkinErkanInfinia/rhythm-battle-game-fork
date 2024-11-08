@@ -68,6 +68,7 @@ MonoBehaviour:
   disappearAfterSeconds: 5
   missile: {fileID: 5492725456860970654, guid: 4b86c56003e4bf04bb188ffda6bebce3, type: 3}
   shootParticle: {fileID: 2175696818672402525}
+  mechanicType: 0
 --- !u!95 &3778536057397766225
 Animator:
   serializedVersion: 5
@@ -102,14 +103,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.33333334, g: 0.7372549, b: 0.972549, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a2091f38dab93bf48809f08d4ce15614, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d4115f1345667af45b1b1d7580fde0ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

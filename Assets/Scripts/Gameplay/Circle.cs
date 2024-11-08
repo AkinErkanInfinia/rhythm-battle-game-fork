@@ -51,6 +51,7 @@ namespace Gameplay
             Destroy(gameObject, 1.5f);
         }
 
+
         public void PlayCollectedSound()
         {
             AudioManager.Instance.PlaySoundFXClip(collectedSound, transform);

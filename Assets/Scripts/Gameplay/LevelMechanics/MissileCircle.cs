@@ -57,6 +57,14 @@ namespace Gameplay.LevelMechanics
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (other.CompareTag("Circle") && mechanicType == MechanicType.Alien)
+            {
+                GetComponentInChildren<ParticleSystem>().Play();
+                GameManager.SpawnedCircles.Remove(other.gameObject);
+                Destroy(other.gameObject);
+                return;
+            }
+            
             if (!other.CompareTag("Player") || mechanicType == MechanicType.Alien) { return; }
             
             _side = other.GetComponent<PlayerController>().playerSide;
@@ -77,17 +85,26 @@ namespace Gameplay.LevelMechanics
             {
                 dest = new Vector2(Random.Range(targetXMin, targetXMax), targetY);
             }
-            else
-            {
-                var circles = GameManager.SpawnedCircles;
-                if (circles.Count == 0) { return; }
-                var randomCirclePosition = circles[Random.Range(0, circles.Count)].transform.position;
-                dest = transform.parent.transform.InverseTransformPoint(randomCirclePosition);
-            }
 
             var obj = Instantiate(missile, transform.parent.transform).GetComponent<Missile>();
             obj.transform.localPosition = transform.localPosition;
             obj.SendMissile(transform.localPosition, dest, mechanicType);
+        }
+
+        public async void TeleportAlien()
+        {
+            var circles = GameManager.SpawnedCircles;
+            if (circles.Count == 0) { return; }
+            
+            _animator.SetTrigger("AlienTeleportIn");
+            
+            await UniTask.WaitForSeconds(0.25f);
+            
+            var randomCircle = circles[Random.Range(0, circles.Count)].GetComponent<Circle>();
+            var dest = transform.parent.transform.InverseTransformPoint(randomCircle.transform.position);
+            dest += randomCircle.dir.normalized * 750;
+            dest.y = Mathf.Clamp(dest.y, -1400, 1400);
+            transform.localPosition = dest;
         }
 
         private void DestroyMe()

@@ -45,17 +45,20 @@ namespace Managers
         public GameObject rightBgParticle;
         
         [Space(10)]
-        [Header("Countdown Screen Popup")]
-        public GameObject popupObject;
-        public RectTransform popupBg;
-        public TextMeshProUGUI popupTitle;
-        public TextMeshProUGUI popupCountdown;
+        [Header("Game Start Popup")]
+        public GameObject startScreenBackground;
+        public RectTransform startScreenContent;
+        public TextMeshProUGUI startScreenLevelText;
+        public TextMeshProUGUI startScreenCountdown;
+        public GameObject[] highScores;
 
         [Space(10)]
-        [Header("End Screen Popup")]
-        public GameObject endScreenPopup;
-        public RectTransform endScreenBg;
-        public TextMeshProUGUI endScreenTitle;
+        [Header("Round End Popup")]
+        public GameObject roundEndBackground;
+        public RectTransform roundEndContent;
+        public TextMeshProUGUI roundEndText;
+        public TextMeshProUGUI roundEndLevelText;
+        public GameObject[] playerScores;
 
         public static List<GameObject> SpawnedCircles;
         public static List<GameObject> RedSpawners;
@@ -68,6 +71,9 @@ namespace Managers
         
         private void Start()
         {
+            redTeam.SetTeamName("Red Team");
+            blueTeam.SetTeamName("Blue Team");
+            
             Timer.TimeIsUp += OnTimeIsUp;
             GameBoundCollider.NormalDamageTaken += OnNormalDamageTaken;
             GameBoundCollider.MissileDamageTaken += OnMissileDamageTaken;
@@ -79,7 +85,7 @@ namespace Managers
             BlueSpawners = new List<GameObject>();
             
             CreateSpawners();
-            NextRound();
+            StartGame();
         }
 
         private void Update()
@@ -140,12 +146,6 @@ namespace Managers
 
         private void OnTimeIsUp(TimerType type)
         {
-            if (type == TimerType.GetReady)
-            {
-                AudioManager.Instance.PlaySoundFXClip(prepareTimeFinished, transform);
-                return;
-            }
-            
             AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
             if (_round == 5) { FinishGame(); }
             else { NextRound(); }
@@ -155,22 +155,49 @@ namespace Managers
         {
             _round++;
             _isRoundStarted = false;
-            
-            var title = _round == 1 ? "Get Ready!" : "Next Round!";
-            popupTitle.text = title;
-            UIAnimations.PopupFadeIn(popupObject.GetComponent<Image>(), popupBg, 1f);
 
+            roundEndLevelText.text = $"LVL{_round}";
+            UpdateTeamScores();
             ClearAllCirclesOnTheBoard();
+            UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
             playersCanvas.SetActive(false);
-            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, popupCountdown, TimerType.GetReady);
+            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, roundEndText, TimerType.RoundEnd);
             
             await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
             
-            UIAnimations.PopupFadeOut(popupObject.GetComponent<Image>(), popupBg, 1f);
+            UIAnimations.PopupDissolveOut(roundEndBackground, roundEndContent, 1f);
             playersCanvas.SetActive(true);
             timer.StartTimer(gameConfigReader.data.roundDuration, timerText, TimerType.RoundEnd);
             
-            ResetAttackTime();
+            _isRoundStarted = true;
+        }
+
+        private void UpdateTeamScores()
+        {
+            var mostScoredTeam = redTeam.totalScore >= blueTeam.totalScore ? redTeam : blueTeam;
+            var leastScoredTeam = redTeam.totalScore < blueTeam.totalScore ? redTeam : blueTeam;
+            
+            playerScores[0].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = mostScoredTeam.TeamName;
+            playerScores[0].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = mostScoredTeam.totalScore.ToString();
+            
+            playerScores[1].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = leastScoredTeam.TeamName;
+            playerScores[1].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = leastScoredTeam.totalScore.ToString();
+        }
+
+        private async void StartGame()
+        {
+            _round++;
+            playersCanvas.SetActive(false);
+            startScreenLevelText.text = $"LVL{_round}";
+            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, startScreenCountdown, TimerType.RoundEnd);
+            
+            await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
+
+            playersCanvas.SetActive(true);
+            timer.StartTimer(gameConfigReader.data.roundDuration, timerText, TimerType.RoundEnd);
+            
+            UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            
             _isRoundStarted = true;
         }
 
@@ -178,36 +205,29 @@ namespace Managers
         {
             foreach (var mechanic in mechanics)
             {
-                if (mechanic.activateMechanicAfterRound <= _round)
+                if (mechanic.activateMechanicAfterRound == _round)
                 {
                     mechanic.MechanicLoop(time);
                 }
             }
         }
 
-        private void ResetAttackTime()
-        {
-            redTeam.lastAttackTime = Time.time;
-            blueTeam.lastAttackTime = Time.time;
-        }
-
         private void FinishGame()
         {
             ClearAllCirclesOnTheBoard();
+            playersCanvas.SetActive(false);
 
             _redTotalScore += redTeam.totalScore;
             _blueTotalScore += blueTeam.totalScore;
-            
-            redTeam.isGameFinished = true;
-            blueTeam.isGameFinished = true;
 
             var winner = _blueTotalScore > _redTotalScore
-                ? "Winner is <#0041FF>BLUE</color>"
-                : "Winner is <#FF000C>RED</color>";
+                ? $"Winner is <#0041FF>{blueTeam.TeamName}</color>"
+                : $"Winner is <#FF000C>{redTeam.TeamName}</color>";
             if (_blueTotalScore == _redTotalScore) { winner = "Tie!"; }
             
-            endScreenTitle.text = winner;
-            UIAnimations.PopupFadeIn(endScreenPopup.GetComponent<Image>(), endScreenBg, 1f);
+            roundEndText.text = winner;
+            roundEndText.fontSize = 150f;
+            UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
         }
 
         private void ClearAllCirclesOnTheBoard()

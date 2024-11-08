@@ -4971,12 +4971,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4b9f404444c9314aa49db2bdbda71fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
+  team: {fileID: 0}
   defenceSeconds: 0.5
-  circleCollectedVFXRed: {fileID: 575513725470866096, guid: 5d36afcab022e1c4382bb056d4127f36, type: 3}
-  circleCollectedVFXBlue: {fileID: 8401301904767248829, guid: 67baf40d32b53d24189140ecabb1eb1d, type: 3}
-  circleSentVFXRed: {fileID: 2943206289695409842, guid: 07be5e603dabd804dbd6b3e218553245, type: 3}
-  circleSentVFXBlue: {fileID: 8336975133037670216, guid: 18c72580f14ba4641888c3896e66b920, type: 3}
+  circleSentVFX: {fileID: 8336975133037670216, guid: 18c72580f14ba4641888c3896e66b920, type: 3}
 --- !u!50 &-7872314256932533191
 Rigidbody2D:
   serializedVersion: 4
