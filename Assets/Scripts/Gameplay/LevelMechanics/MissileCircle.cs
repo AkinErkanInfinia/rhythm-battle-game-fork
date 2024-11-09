@@ -101,6 +101,8 @@ namespace Gameplay.LevelMechanics
             await UniTask.WaitForSeconds(0.25f);
             
             var randomCircle = circles[Random.Range(0, circles.Count)].GetComponent<Circle>();
+            if (randomCircle == null) { return; }
+            
             var dest = transform.parent.transform.InverseTransformPoint(randomCircle.transform.position);
             dest += randomCircle.dir.normalized * 750;
             dest.y = Mathf.Clamp(dest.y, -1400, 1400);

@@ -147,8 +147,15 @@ namespace Managers
         private void OnTimeIsUp(TimerType type)
         {
             AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
-            if (_round == 5) { FinishGame(); }
+            if (_round == 5) { IncreaseSpeed(); }
+            if (_round == 6) { FinishGame(); }
             else { NextRound(); }
+        }
+
+        private void IncreaseSpeed()
+        {
+            Time.timeScale += 0.5f;
+            _round++;
         }
 
         private async void NextRound()
@@ -214,6 +221,7 @@ namespace Managers
 
         private void FinishGame()
         {
+            Time.timeScale = 1;
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
 
