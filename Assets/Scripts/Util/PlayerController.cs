@@ -18,7 +18,7 @@ namespace Util
 
         private void Update()
         {
-            if (playerSide == PlayerSide.Red)
+            if (playerSide == PlayerSide.Green)
             {
                 RedPlayerController();
             }

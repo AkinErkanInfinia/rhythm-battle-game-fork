@@ -2,5 +2,5 @@
   "circleCount": 9,
   "circleScale": 1,
   "roundDuration": 10,
-  "timeBetweenRounds": 1
+  "timeBetweenRounds": 5
 }

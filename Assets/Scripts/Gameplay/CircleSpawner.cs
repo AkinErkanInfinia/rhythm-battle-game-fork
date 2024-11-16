@@ -35,7 +35,6 @@ namespace Gameplay
             circle.transform.localPosition = Vector3.zero;
             circle.dir = team.GetDirectionVector();
             circle.sender = team;
-            team.lastAttackTime = Time.time;
             
             GameManager.SpawnedCircles.Add(circle.gameObject);
             

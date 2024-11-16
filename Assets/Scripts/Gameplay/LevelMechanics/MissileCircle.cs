@@ -28,6 +28,7 @@ namespace Gameplay.LevelMechanics
         private BoxCollider2D _collider;
         private UIDissolve _dissolve;
         private PlayerSide _side;
+        private bool _canBeDestroyed;
         private static readonly int startAttack = Animator.StringToHash("StartAttack");
 
         private void Start()
@@ -43,16 +44,23 @@ namespace Gameplay.LevelMechanics
             DisappearTimer();
         }
 
-        private async void DisappearTimer()
+        private void Update()
         {
-            await UniTask.WaitForSeconds(disappearAfterSeconds);
-
-            if (gameObject == null) { return; }
+            if (!_canBeDestroyed) { return; }
             
             if(_animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
             {
                 DestroyMe();
             }
+        }
+
+        private async void DisappearTimer()
+        {
+            await UniTask.WaitForSeconds(disappearAfterSeconds);
+
+            if (gameObject == null) { return; }
+
+            _canBeDestroyed = true;
         }
 
         private void OnTriggerEnter2D(Collider2D other)

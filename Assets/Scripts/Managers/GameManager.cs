@@ -18,7 +18,6 @@ namespace Managers
         public int collisionPoint;
         public int normalDamagePoint;
         public int missileDamagePoint;
-        public int inactivityPenaltyPoint;
         
         [Space(10)]
         [Header("References")]
@@ -30,19 +29,13 @@ namespace Managers
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
+        public TextMeshProUGUI currentLevelText;
         public LevelMechanicBase[] mechanics;
         public Team redTeam;
         public Team blueTeam;
 
         [Space(10)] [Header("Audio")] 
-        public SoundClip prepareTimeFinished;
         public SoundClip roundTimeFinished;
-        
-        [Space(10)]
-        [Header("Background")]
-        public OffsetScrolling[] scrollers;
-        public GameObject leftBgParticle;
-        public GameObject rightBgParticle;
         
         [Space(10)]
         [Header("Game Start Popup")]
@@ -54,11 +47,8 @@ namespace Managers
 
         [Space(10)]
         [Header("Round End Popup")]
-        public GameObject roundEndBackground;
         public RectTransform roundEndContent;
-        public TextMeshProUGUI roundEndText;
-        public TextMeshProUGUI roundEndLevelText;
-        public GameObject[] playerScores;
+        public TextMeshProUGUI[] roundEndLevelTexts;
 
         public static List<GameObject> SpawnedCircles;
         public static List<GameObject> RedSpawners;
@@ -77,7 +67,6 @@ namespace Managers
             Timer.TimeIsUp += OnTimeIsUp;
             GameBoundCollider.NormalDamageTaken += OnNormalDamageTaken;
             GameBoundCollider.MissileDamageTaken += OnMissileDamageTaken;
-            Team.InactivityActivated += OnInactivityActivated;
             Circle.CirclesCollided += OnCirclesCollided;
 
             SpawnedCircles = new List<GameObject>();
@@ -119,11 +108,6 @@ namespace Managers
             sender.AddScore(collisionPoint);
         }
 
-        private void OnInactivityActivated(Team sender)
-        {
-            sender.DecreaseScore(inactivityPenaltyPoint);
-        }
-
         private void OnNormalDamageTaken(Team sender)
         {
             GetOpponentOf(sender).AddScore(normalDamagePoint);
@@ -163,32 +147,26 @@ namespace Managers
             _round++;
             _isRoundStarted = false;
 
-            roundEndLevelText.text = $"LVL{_round}";
-            UpdateTeamScores();
+            UpdateLevelTexts();
             ClearAllCirclesOnTheBoard();
-            UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
+            UIAnimations.PopupFadeIn(roundEndContent, 1f);
             playersCanvas.SetActive(false);
-            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, roundEndText, TimerType.RoundEnd);
+            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, TimerType.RoundEnd);
             
             await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
             
-            UIAnimations.PopupDissolveOut(roundEndBackground, roundEndContent, 1f);
+            UIAnimations.PopupFadeOut(roundEndContent, 1f);
             playersCanvas.SetActive(true);
-            timer.StartTimer(gameConfigReader.data.roundDuration, timerText, TimerType.RoundEnd);
+            timer.StartTimer(gameConfigReader.data.roundDuration, TimerType.RoundEnd, timerText);
             
             _isRoundStarted = true;
         }
 
-        private void UpdateTeamScores()
+        private void UpdateLevelTexts()
         {
-            var mostScoredTeam = redTeam.totalScore >= blueTeam.totalScore ? redTeam : blueTeam;
-            var leastScoredTeam = redTeam.totalScore < blueTeam.totalScore ? redTeam : blueTeam;
-            
-            playerScores[0].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = mostScoredTeam.TeamName;
-            playerScores[0].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = mostScoredTeam.totalScore.ToString();
-            
-            playerScores[1].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = leastScoredTeam.TeamName;
-            playerScores[1].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = leastScoredTeam.totalScore.ToString();
+            roundEndLevelTexts[0].text = $"LEVEL {_round}";
+            roundEndLevelTexts[1].text = $"LEVEL {_round}";
+            currentLevelText.text = $"LEVEL {_round}";
         }
 
         private async void StartGame()
@@ -196,12 +174,12 @@ namespace Managers
             _round++;
             playersCanvas.SetActive(false);
             startScreenLevelText.text = $"LVL{_round}";
-            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, startScreenCountdown, TimerType.RoundEnd);
+            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, TimerType.RoundEnd, startScreenCountdown);
             
             await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
 
             playersCanvas.SetActive(true);
-            timer.StartTimer(gameConfigReader.data.roundDuration, timerText, TimerType.RoundEnd);
+            timer.StartTimer(gameConfigReader.data.roundDuration, TimerType.RoundEnd, timerText);
             
             UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
             
@@ -233,9 +211,9 @@ namespace Managers
                 : $"Winner is <#FF000C>{redTeam.TeamName}</color>";
             if (_blueTotalScore == _redTotalScore) { winner = "Tie!"; }
             
-            roundEndText.text = winner;
-            roundEndText.fontSize = 150f;
-            UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
+            // roundEndText.text = winner;
+            // roundEndText.fontSize = 150f;
+            // UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
         }
 
         private void ClearAllCirclesOnTheBoard()
@@ -246,16 +224,6 @@ namespace Managers
             {
                 Destroy(circle);
             }
-        }
-
-        private void ChangeScrollerDirection()
-        {
-            foreach (var scroller in scrollers)
-            {
-                scroller.scrollSpeed *= -1;
-            }
-            leftBgParticle.SetActive(false);
-            rightBgParticle.SetActive(true);
         }
     }
 }
