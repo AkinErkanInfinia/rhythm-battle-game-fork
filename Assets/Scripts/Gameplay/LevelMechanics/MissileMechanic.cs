@@ -5,6 +5,7 @@ namespace Gameplay.LevelMechanics
 {
     public class MissileMechanic : LevelMechanicBase
     {
+        public Team team;
         public GameObject circlePrefab;
         public float minSpawnTime;
         public float maxSpawnTime;
@@ -28,8 +29,9 @@ namespace Gameplay.LevelMechanics
         {
             _isSpawned = true;
             var pos = GetRandomPosition();
-            var circle = Instantiate(circlePrefab, spawnParent.transform);
+            var circle = Instantiate(circlePrefab, spawnParent.transform).GetComponent<MissileCircle>();
             circle.transform.localPosition = new Vector3(pos.x, pos.y, 0);
+            circle.sender = team;
         }
 
         private bool CanSpawn()

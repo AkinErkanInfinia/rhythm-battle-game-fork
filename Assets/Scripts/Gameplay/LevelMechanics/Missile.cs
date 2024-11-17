@@ -13,6 +13,7 @@ namespace Gameplay.LevelMechanics
         public float lockTime;
         public float speed = 3;
         public float deviation = 1000f;
+        [HideInInspector] public Team sender;
         [HideInInspector] public Vector2 startPoint;
         [HideInInspector] public Vector2 destinationPoint;
         
@@ -42,24 +43,10 @@ namespace Gameplay.LevelMechanics
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("GameBound") && _mechanicType == MechanicType.Missile)
+            Hit();
+            if (_mechanicType == MechanicType.Lock && other.TryGetComponent<CircleSpawner>(out var spawner))
             {
-                Hit();
-            }
-            
-            if (other.CompareTag("Circle") && _mechanicType == MechanicType.Alien)
-            {
-                Hit();
-                other.GetComponent<Circle>().DestroyCircle();
-            }
-            
-            if (other.CompareTag("CircleSpawner") && _mechanicType == MechanicType.Lock)
-            {
-                Hit();
-                if (other.TryGetComponent<CircleSpawner>(out var spawner))
-                {
-                    spawner.LockSpawner(lockTime);
-                }
+                spawner.LockSpawner(lockTime);
             }
         }
 

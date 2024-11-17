@@ -8,6 +8,8 @@ namespace Util
     {
         public GameConfigData data;
         
+        public static GameConfigReader Instance { get; private set; }
+        
         private void Awake()
         {
             string filePath = Application.streamingAssetsPath + "/config.json";
@@ -21,6 +23,14 @@ namespace Util
                 Debug.LogError("File not found");
                 CreateDefaultSettingsFile(filePath);
             }
+            
+            // Singleton
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+                return;
+            }
+            Instance = this;
         }
         
         void CreateDefaultSettingsFile(string filePath)
@@ -30,7 +40,10 @@ namespace Util
                 circleCount = 9,
                 circleScale = 1,
                 roundDuration = 60,
-                timeBetweenRounds = 5
+                timeBetweenRounds = 5,
+                circleCollisionPoint = 1,
+                circleHitEnemyWeaponPoint = 3,
+                missileDamagePoint = 1
             };
 
             string jsonContent = JsonUtility.ToJson(data, true);
@@ -51,6 +64,9 @@ namespace Util
             public float circleScale;
             public int roundDuration;
             public int timeBetweenRounds;
+            public int circleCollisionPoint;
+            public int circleHitEnemyWeaponPoint;
+            public int missileDamagePoint;
         }
     }
 }

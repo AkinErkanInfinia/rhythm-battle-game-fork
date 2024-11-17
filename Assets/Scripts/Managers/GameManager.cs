@@ -1,27 +1,17 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Gameplay;
 using Gameplay.LevelMechanics;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Util;
 
 namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
-        [Header("Settings")]
-        public int collisionPoint;
-        public int normalDamagePoint;
-        public int missileDamagePoint;
-        
         [Space(10)]
         [Header("References")]
-        public GameConfigReader gameConfigReader;
         public GameObject redSpawnerParent;
         public GameObject blueSpawnerParent;
         public GameObject redSpawnerPrefab;
@@ -50,7 +40,7 @@ namespace Managers
         public RectTransform roundEndContent;
         public TextMeshProUGUI[] roundEndLevelTexts;
 
-        public static List<GameObject> SpawnedCircles;
+        public static List<Circle> SpawnedCircles;
         public static List<GameObject> RedSpawners;
         public static List<GameObject> BlueSpawners;
 
@@ -65,11 +55,8 @@ namespace Managers
             blueTeam.SetTeamName("Blue Team");
             
             Timer.TimeIsUp += OnTimeIsUp;
-            GameBoundCollider.NormalDamageTaken += OnNormalDamageTaken;
-            GameBoundCollider.MissileDamageTaken += OnMissileDamageTaken;
-            Circle.CirclesCollided += OnCirclesCollided;
 
-            SpawnedCircles = new List<GameObject>();
+            SpawnedCircles = new List<Circle>();
             RedSpawners = new List<GameObject>();
             BlueSpawners = new List<GameObject>();
             
@@ -87,13 +74,13 @@ namespace Managers
 
         private void CreateSpawners()
         {
-            for (int i = 0; i < gameConfigReader.data.circleCount; i++)
+            for (int i = 0; i < GameConfigReader.Instance.data.circleCount; i++)
             {
                 var redSpawner = Instantiate(redSpawnerPrefab, redSpawnerParent.transform);
                 var blueSpawner = Instantiate(blueSpawnerPrefab, blueSpawnerParent.transform);
 
-                redSpawner.transform.localScale = Vector3.one * gameConfigReader.data.circleScale;
-                blueSpawner.transform.localScale = Vector3.one * gameConfigReader.data.circleScale;
+                redSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
+                blueSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
                 
                 redSpawner.GetComponent<CircleSpawner>().team = redTeam;
                 blueSpawner.GetComponent<CircleSpawner>().team = blueTeam;
@@ -101,21 +88,6 @@ namespace Managers
                 RedSpawners.Add(redSpawner);
                 BlueSpawners.Add(blueSpawner);
             }
-        }
-
-        private void OnCirclesCollided(Team sender)
-        {
-            sender.AddScore(collisionPoint);
-        }
-
-        private void OnNormalDamageTaken(Team sender)
-        {
-            GetOpponentOf(sender).AddScore(normalDamagePoint);
-        }
-
-        private void OnMissileDamageTaken(Team sender)
-        {
-            GetOpponentOf(sender).AddScore(missileDamagePoint);
         }
 
         private Team GetOpponentOf(Team team)
@@ -151,13 +123,13 @@ namespace Managers
             ClearAllCirclesOnTheBoard();
             UIAnimations.PopupFadeIn(roundEndContent, 1f);
             playersCanvas.SetActive(false);
-            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, TimerType.RoundEnd);
+            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd);
             
-            await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
+            await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
             
             UIAnimations.PopupFadeOut(roundEndContent, 1f);
             playersCanvas.SetActive(true);
-            timer.StartTimer(gameConfigReader.data.roundDuration, TimerType.RoundEnd, timerText);
+            timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
             _isRoundStarted = true;
         }
@@ -166,20 +138,20 @@ namespace Managers
         {
             roundEndLevelTexts[0].text = $"LEVEL {_round}";
             roundEndLevelTexts[1].text = $"LEVEL {_round}";
-            currentLevelText.text = $"LEVEL {_round}";
+            currentLevelText.text = $"LVL {_round}";
         }
 
         private async void StartGame()
         {
             _round++;
             playersCanvas.SetActive(false);
-            startScreenLevelText.text = $"LVL{_round}";
-            timer.StartTimer(gameConfigReader.data.timeBetweenRounds, TimerType.RoundEnd, startScreenCountdown);
+            startScreenLevelText.text = $"LVL {_round}";
+            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd, startScreenCountdown);
             
-            await UniTask.WaitForSeconds(gameConfigReader.data.timeBetweenRounds);
+            await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
 
             playersCanvas.SetActive(true);
-            timer.StartTimer(gameConfigReader.data.roundDuration, TimerType.RoundEnd, timerText);
+            timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
             UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
             
@@ -222,7 +194,7 @@ namespace Managers
             
             foreach (var circle in SpawnedCircles)
             {
-                Destroy(circle);
+                Destroy(circle.gameObject);
             }
         }
     }

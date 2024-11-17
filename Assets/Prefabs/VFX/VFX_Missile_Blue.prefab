@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5899130756197890102}
   - component: {fileID: 391119600407724543}
   - component: {fileID: 8141602910573682327}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4853,7 +4853,7 @@ GameObject:
   - component: {fileID: 3421066574416331223}
   - component: {fileID: 777294062273933798}
   - component: {fileID: 3229414088323944884}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: RocketImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4929,7 +4929,7 @@ GameObject:
   - component: {fileID: 7013191435022584649}
   - component: {fileID: 8938870802404393831}
   - component: {fileID: 905322906709268002}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: VFX_Missile_Blue
   m_TagString: Missile
   m_Icon: {fileID: 0}
@@ -4974,6 +4974,7 @@ MonoBehaviour:
   lockTime: 0
   speed: 2
   deviation: 1000
+  sender: {fileID: 0}
   startPoint: {x: 0, y: 0}
   destinationPoint: {x: 0, y: 0}
 --- !u!61 &8938870802404393831
@@ -5040,7 +5041,7 @@ GameObject:
   - component: {fileID: 8352194402424752963}
   - component: {fileID: 8326099491906692045}
   - component: {fileID: 7480603990395530392}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Beam_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

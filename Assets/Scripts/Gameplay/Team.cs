@@ -20,7 +20,6 @@ namespace Gameplay
         public int totalScore;
         public TextMeshProUGUI scoreText;
         public TextMeshProUGUI nameText;
-        [HideInInspector] public bool isGameFinished;
         
         private string _teamName;
         
@@ -39,13 +38,6 @@ namespace Gameplay
         public void AddScore(int score)
         {
             totalScore += score;
-            scoreText.text = totalScore.ToString();
-        }
-
-        public void DecreaseScore(int score)
-        {
-            totalScore -= score;
-            if (totalScore < 0) { totalScore = 0; }
             scoreText.text = totalScore.ToString();
         }
 

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3667773027699836595}
   - component: {fileID: 1490912080989349880}
   - component: {fileID: 8373443023763790203}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4875,7 +4875,7 @@ GameObject:
   - component: {fileID: 5626968863789445819}
   - component: {fileID: 5370326088233388567}
   - component: {fileID: 4024500211025282676}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Smoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9577,7 +9577,7 @@ GameObject:
   - component: {fileID: 5669617218792471677}
   - component: {fileID: 7321521090690913943}
   - component: {fileID: 2885428670127384766}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: AlienImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9654,7 +9654,7 @@ GameObject:
   - component: {fileID: 2746276138900029405}
   - component: {fileID: 5490661210830056923}
   - component: {fileID: 1011347840871578379}
-  m_Layer: 5
+  m_Layer: 13
   m_Name: AlienCircle_Blue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9702,13 +9702,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39a8d1abe5c782a448114efa472d8bc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetXMin: -1370
-  targetXMax: 1072
-  targetY: 1300
   disappearAfterSeconds: 5
   missile: {fileID: 8577736599698436678, guid: 49dcc261b176ab14b97e232dad5c1f1d, type: 3}
   shootParticle: {fileID: 7355331723601636951}
   mechanicType: 2
+  sender: {fileID: 0}
 --- !u!95 &5490661210830056923
 Animator:
   serializedVersion: 5
@@ -9786,7 +9784,7 @@ GameObject:
   - component: {fileID: 4079367484374318438}
   - component: {fileID: 7718974234705463369}
   - component: {fileID: 3772110138141012495}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: VFX_AlienHit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14620,7 +14618,7 @@ GameObject:
   - component: {fileID: 8877372912917011906}
   - component: {fileID: 1225977445257199584}
   - component: {fileID: 4823582167285297725}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19520,7 +19518,7 @@ GameObject:
   - component: {fileID: 2229053322060465056}
   - component: {fileID: 699790413833681902}
   - component: {fileID: 2219872955854806603}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Beam
   m_TagString: Untagged
   m_Icon: {fileID: 0}

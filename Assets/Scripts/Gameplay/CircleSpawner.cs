@@ -1,6 +1,9 @@
+using System;
 using Cysharp.Threading.Tasks;
+using Gameplay.LevelMechanics;
 using Managers;
 using UnityEngine;
+using Util;
 
 namespace Gameplay
 {
@@ -12,13 +15,39 @@ namespace Gameplay
         
         private GameObject _circle;
         private float _lastActivatedTime;
-        private BoxCollider2D _boxCollider;
         private ParticleSystem _particle;
+        public bool IsLocked { get; private set; }
 
         private void Start()
         { 
-            _boxCollider = GetComponent<BoxCollider2D>();
             _particle = GetComponentInChildren<ParticleSystem>();
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.TryGetComponent<Circle>(out var circle))
+            {
+                PlayHitVfx();
+                
+                circle.PlayMissedSound();
+                GameManager.SpawnedCircles.Remove(circle);
+                LockSpawner(1f);
+                circle.sender.AddScore(GameConfigReader.Instance.data.circleHitEnemyWeaponPoint);
+                Destroy(circle.gameObject);
+                //UIAnimations.MissedCircleEffect(_image, 0.25f);
+                
+            }
+
+            if (other.TryGetComponent<Missile>(out var missile))
+            {
+                missile.sender.AddScore(GameConfigReader.Instance.data.missileDamagePoint);
+                //UIAnimations.MissedCircleEffect(_image, 0.25f);
+            }
+        }
+
+        private void PlayHitVfx()
+        {
+            
         }
 
         public void Activate()
@@ -36,7 +65,7 @@ namespace Gameplay
             circle.dir = team.GetDirectionVector();
             circle.sender = team;
             
-            GameManager.SpawnedCircles.Add(circle.gameObject);
+            GameManager.SpawnedCircles.Add(circle);
             
             var particle = Instantiate(circleSentVFX, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
@@ -46,11 +75,11 @@ namespace Gameplay
 
         public async void LockSpawner(float time)
         {
-            _boxCollider.enabled = false;
+            IsLocked = true;
             _particle.Play();
             await UniTask.WaitForSeconds(time);
-            _boxCollider.enabled = true;
             _particle.Stop();
+            IsLocked = false;
         }
     }
     

@@ -25,24 +25,7 @@ namespace Gameplay
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.TryGetComponent<Circle>(out var circle))
-            {
-                PlayHitVfx(other.ClosestPoint(transform.position));
-                
-                circle.PlayMissedSound();
-                GameManager.SpawnedCircles.Remove(circle.gameObject);
-                Destroy(circle.gameObject);
-                UIAnimations.MissedCircleEffect(_image, 0.25f);
-                
-                NormalDamageTaken?.Invoke(owner);
-            }
-
-            if (other.TryGetComponent<Missile>(out var missile))
-            {
-                UIAnimations.MissedCircleEffect(_image, 0.25f);
-                
-                MissileDamageTaken?.Invoke(owner);
-            }
+            
         }
 
         private void PlayHitVfx(Vector3 position)

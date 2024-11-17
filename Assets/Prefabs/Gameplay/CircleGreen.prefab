@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7018760353623890261}
   - component: {fileID: 65734212803060786}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 3278159645511041155}
   - component: {fileID: 6879125856145100895}
   - component: {fileID: 287297856722290628}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4997,7 +4997,7 @@ GameObject:
   - component: {fileID: 478525982527147382}
   - component: {fileID: 7387900302000865177}
   - component: {fileID: 3911340581575531722}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Particles_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9839,7 +9839,7 @@ GameObject:
   - component: {fileID: 889956287069532618}
   - component: {fileID: 6435615468187033557}
   - component: {fileID: 451398046126942402}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BallFireIn_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14752,7 +14752,7 @@ GameObject:
   - component: {fileID: 4311829530091455639}
   - component: {fileID: 8288889836348347257}
   - component: {fileID: 3665000278106271852}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: CircleGreen
   m_TagString: Circle
   m_Icon: {fileID: 0}
@@ -14896,9 +14896,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.05
-  collectedSound:
-    audioClip: {fileID: 8300000, guid: 6fede028ba58b48d08e05b2bff883359, type: 3}
-    volume: 1
   missedSound:
     audioClip: {fileID: 8300000, guid: 1916972b0254443a2ac996968e38335c, type: 3}
     volume: 1

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2342343815579618993}
   - component: {fileID: 2987194163695635599}
   - component: {fileID: 8643746333560051831}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: VFX_Locked
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4850,7 +4850,7 @@ GameObject:
   - component: {fileID: 9017005913106530634}
   - component: {fileID: -1123499729307055883}
   - component: {fileID: -7872314256932533191}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: CircleSpawnerBlue
   m_TagString: CircleSpawner
   m_Icon: {fileID: 0}
@@ -5013,7 +5013,7 @@ GameObject:
   - component: {fileID: 8346981821456215625}
   - component: {fileID: 5826995912142915137}
   - component: {fileID: 722171597361800210}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9856,7 +9856,7 @@ GameObject:
   - component: {fileID: 9009543361551253765}
   - component: {fileID: 7400126535992980694}
   - component: {fileID: 4748455608936276967}
-  m_Layer: 5
+  m_Layer: 10
   m_Name: Particle System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
