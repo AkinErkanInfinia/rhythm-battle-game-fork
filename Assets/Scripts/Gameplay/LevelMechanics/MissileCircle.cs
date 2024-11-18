@@ -83,7 +83,7 @@ namespace Gameplay.LevelMechanics
 
         public void AttackMissile()
         {
-            var spawners = _side == PlayerSide.Blue ? GameManager.RedSpawners : GameManager.BlueSpawners;
+            var spawners = _side == PlayerSide.Blue ? GameManager.GreenSpawners : GameManager.BlueSpawners;
             var dest = spawners[Random.Range(0, spawners.Count)].transform.position;
             dest = transform.parent.transform.InverseTransformPoint(dest);
             
@@ -105,7 +105,7 @@ namespace Gameplay.LevelMechanics
             var enemyCircles = circles
                 .Where(c => c.sender.playerSide != side)
                 .ToList();
-            var randomCircle = enemyCircles.ElementAt(Random.Range(0, enemyCircles.Count));
+            var randomCircle = enemyCircles.ElementAtOrDefault(Random.Range(0, enemyCircles.Count));
             if (randomCircle == null) { return; }
             
             var dest = transform.parent.transform.InverseTransformPoint(randomCircle.transform.position);

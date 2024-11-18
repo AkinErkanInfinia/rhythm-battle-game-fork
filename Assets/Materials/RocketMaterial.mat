@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: RocketMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: bc77effe022c45849a728fac4a23aa41, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 9665439ac7e1b83489c673e35dcefd05, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -74,6 +74,8 @@ Material:
     m_Ints: []
     m_Floats:
     - AlphaClip_: 0.01
+    - Vector1_8B5B67D: 20
+    - Vector1_8F22EE36: 0.01
     - Vector1_AE769210: 20
     - Vector1_C1728026: 0
     - Vector1_D1034171: 0
@@ -82,6 +84,7 @@ Material:
     - _QueueOffset: 0
     m_Colors:
     - Color_: {r: 1, g: 1, b: 1, a: 1}
+    - Color_34BEEA07: {r: 1, g: 1, b: 1, a: 1}
     - Color_DB555ADA: {r: 1, g: 1, b: 1, a: 1}
     - Vector2_781FB8A4: {r: 1, g: 1, b: 0, a: 0}
     - Vector2_892CE00: {r: 1, g: 1, b: 0, a: 0}

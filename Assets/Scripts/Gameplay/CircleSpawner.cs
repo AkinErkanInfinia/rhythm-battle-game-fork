@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Gameplay.LevelMechanics;
 using Managers;
 using UnityEngine;
+using UnityEngine.Timeline;
 using Util;
 
 namespace Gameplay
@@ -12,6 +13,8 @@ namespace Gameplay
         public Team team;
         public float defenceSeconds;
         public GameObject circleSentVFX;
+        public GameObject getHitVFX;
+        [HideInInspector] public GameObject circleParent;
         
         private GameObject _circle;
         private float _lastActivatedTime;
@@ -28,26 +31,24 @@ namespace Gameplay
             if (other.TryGetComponent<Circle>(out var circle))
             {
                 PlayHitVfx();
-                
                 circle.PlayMissedSound();
                 GameManager.SpawnedCircles.Remove(circle);
                 LockSpawner(1f);
                 circle.sender.AddScore(GameConfigReader.Instance.data.circleHitEnemyWeaponPoint);
                 Destroy(circle.gameObject);
-                //UIAnimations.MissedCircleEffect(_image, 0.25f);
-                
             }
 
             if (other.TryGetComponent<Missile>(out var missile))
             {
+                PlayHitVfx();
                 missile.sender.AddScore(GameConfigReader.Instance.data.missileDamagePoint);
-                //UIAnimations.MissedCircleEffect(_image, 0.25f);
             }
         }
 
         private void PlayHitVfx()
         {
-            
+            var vfx = Instantiate(getHitVFX, transform);
+            Destroy(vfx, 0.5f);
         }
 
         public void Activate()
@@ -60,8 +61,8 @@ namespace Gameplay
 
         private void Attack()
         {
-            var circle = Instantiate(team.circlePrefab, transform).GetComponent<Circle>();
-            circle.transform.localPosition = Vector3.zero;
+            var circle = Instantiate(team.circlePrefab, circleParent.transform).GetComponent<Circle>();
+            circle.transform.localPosition = transform.localPosition;
             circle.dir = team.GetDirectionVector();
             circle.sender = team;
             

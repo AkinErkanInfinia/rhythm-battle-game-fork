@@ -4,6 +4,7 @@ using Gameplay;
 using Gameplay.LevelMechanics;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Managers
@@ -12,16 +13,18 @@ namespace Managers
     {
         [Space(10)]
         [Header("References")]
-        public GameObject redSpawnerParent;
+        public GameObject greenSpawnerParent;
         public GameObject blueSpawnerParent;
-        public GameObject redSpawnerPrefab;
+        public GameObject greenCircleParent;
+        public GameObject blueCircleParent;
+        public GameObject greenSpawnerPrefab;
         public GameObject blueSpawnerPrefab;
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
         public TextMeshProUGUI currentLevelText;
         public LevelMechanicBase[] mechanics;
-        public Team redTeam;
+        public Team greenTeam;
         public Team blueTeam;
 
         [Space(10)] [Header("Audio")] 
@@ -41,23 +44,23 @@ namespace Managers
         public TextMeshProUGUI[] roundEndLevelTexts;
 
         public static List<Circle> SpawnedCircles;
-        public static List<GameObject> RedSpawners;
+        public static List<GameObject> GreenSpawners;
         public static List<GameObject> BlueSpawners;
 
         private int _round;
-        private int _redTotalScore;
+        private int _greenTotalScore;
         private int _blueTotalScore;
         private bool _isRoundStarted;
         
         private void Start()
         {
-            redTeam.SetTeamName("Red Team");
+            greenTeam.SetTeamName("Green Team");
             blueTeam.SetTeamName("Blue Team");
             
             Timer.TimeIsUp += OnTimeIsUp;
 
             SpawnedCircles = new List<Circle>();
-            RedSpawners = new List<GameObject>();
+            GreenSpawners = new List<GameObject>();
             BlueSpawners = new List<GameObject>();
             
             CreateSpawners();
@@ -76,23 +79,21 @@ namespace Managers
         {
             for (int i = 0; i < GameConfigReader.Instance.data.circleCount; i++)
             {
-                var redSpawner = Instantiate(redSpawnerPrefab, redSpawnerParent.transform);
+                var redSpawner = Instantiate(greenSpawnerPrefab, greenSpawnerParent.transform);
                 var blueSpawner = Instantiate(blueSpawnerPrefab, blueSpawnerParent.transform);
 
                 redSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
                 blueSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
                 
-                redSpawner.GetComponent<CircleSpawner>().team = redTeam;
+                redSpawner.GetComponent<CircleSpawner>().team = greenTeam;
                 blueSpawner.GetComponent<CircleSpawner>().team = blueTeam;
                 
-                RedSpawners.Add(redSpawner);
+                redSpawner.GetComponent<CircleSpawner>().circleParent = greenCircleParent;
+                blueSpawner.GetComponent<CircleSpawner>().circleParent = blueCircleParent;
+                
+                GreenSpawners.Add(redSpawner);
                 BlueSpawners.Add(blueSpawner);
             }
-        }
-
-        private Team GetOpponentOf(Team team)
-        {
-            return team.playerSide == PlayerSide.Blue ? redTeam : blueTeam;
         }
 
         private void OnDestroy()
@@ -110,7 +111,7 @@ namespace Managers
 
         private void IncreaseSpeed()
         {
-            Time.timeScale += 0.5f;
+            Time.timeScale += 1f;
             _round++;
         }
 
@@ -175,17 +176,17 @@ namespace Managers
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
 
-            _redTotalScore += redTeam.totalScore;
+            _greenTotalScore += greenTeam.totalScore;
             _blueTotalScore += blueTeam.totalScore;
 
-            var winner = _blueTotalScore > _redTotalScore
+            var winner = _blueTotalScore > _greenTotalScore
                 ? $"Winner is <#0041FF>{blueTeam.TeamName}</color>"
-                : $"Winner is <#FF000C>{redTeam.TeamName}</color>";
-            if (_blueTotalScore == _redTotalScore) { winner = "Tie!"; }
+                : $"Winner is <#FF000C>{greenTeam.TeamName}</color>";
+            if (_blueTotalScore == _greenTotalScore) { winner = "Tie!"; }
             
-            // roundEndText.text = winner;
-            // roundEndText.fontSize = 150f;
-            // UIAnimations.PopupDissolveIn(roundEndBackground, roundEndContent, 1f);
+            startScreenCountdown.text = winner;
+            startScreenCountdown.fontSize = 150f;
+            UIAnimations.PopupDissolveIn(startScreenBackground, startScreenContent, 1f);
         }
 
         private void ClearAllCirclesOnTheBoard()
@@ -194,6 +195,8 @@ namespace Managers
             
             foreach (var circle in SpawnedCircles)
             {
+                if (!circle) { return; }
+                
                 Destroy(circle.gameObject);
             }
         }

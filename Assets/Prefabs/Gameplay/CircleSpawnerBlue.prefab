@@ -4975,6 +4975,7 @@ MonoBehaviour:
   team: {fileID: 0}
   defenceSeconds: 0.5
   circleSentVFX: {fileID: 8336975133037670216, guid: 18c72580f14ba4641888c3896e66b920, type: 3}
+  getHitVFX: {fileID: 4236222259458075955, guid: c3a7303573ddf8148a9c6cd400fd95dd, type: 3}
 --- !u!50 &-7872314256932533191
 Rigidbody2D:
   serializedVersion: 4
