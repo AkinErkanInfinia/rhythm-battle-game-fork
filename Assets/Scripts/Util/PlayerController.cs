@@ -18,7 +18,7 @@ namespace Util
 
         private void Update()
         {
-            if (playerSide == PlayerSide.Red)
+            if (playerSide == PlayerSide.Green)
             {
                 RedPlayerController();
             }
@@ -51,8 +51,10 @@ namespace Util
                 pos = _rectTransform.anchoredPosition + new Vector2(moveSpeed * Time.deltaTime, 0);
             }
 
-            pos.x = Mathf.Clamp(pos.x, -910, -50);
-            pos.y = Mathf.Clamp(pos.y, -290, 290);
+            var w = _rectTransform.rect.width;
+            var h = _rectTransform.rect.height;
+            pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
+            pos.y = Mathf.Clamp(pos.y, 0 + h, 1465 - h);
             _rectTransform.anchoredPosition = pos;
         }
 
@@ -78,9 +80,10 @@ namespace Util
             {
                 pos = _rectTransform.anchoredPosition + new Vector2(moveSpeed * Time.deltaTime, 0);
             }
-
-            pos.x = Mathf.Clamp(pos.x, 50, 910);
-            pos.y = Mathf.Clamp(pos.y, -290, 290);
+            var w = _rectTransform.rect.width;
+            var h = _rectTransform.rect.height;
+            pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
+            pos.y = Mathf.Clamp(pos.y, -1465 + h, 0 - h);
             _rectTransform.anchoredPosition = pos;
         }
     }

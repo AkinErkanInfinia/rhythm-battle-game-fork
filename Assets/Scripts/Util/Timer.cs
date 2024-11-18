@@ -27,6 +27,8 @@ namespace Util
             if (_timeRemaining > 0)
             {
                 _timeRemaining -= Time.deltaTime;
+
+                if (!_timerText) { return; }
                 _timerText.text = (Mathf.FloorToInt(_timeRemaining) + 1).ToString();
             }
             else
@@ -37,12 +39,19 @@ namespace Util
             }
         }
 
-        public void StartTimer(float startFrom, TextMeshProUGUI targetText, TimerType type)
+        public void StartTimer(float startFrom, TimerType type, TextMeshProUGUI targetText = null)
         {
             _timerText = targetText;
             _timeRemaining = startFrom;
             _isTimerRunning = true;
             _currentTimerType = type;
+        }
+
+        public int GetCurrentGameTime()
+        {
+            if (_currentTimerType != TimerType.RoundEnd) { return 0; }
+            
+            return Mathf.FloorToInt(_timeRemaining) + 1;
         }
     }
 }

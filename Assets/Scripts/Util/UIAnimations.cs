@@ -1,3 +1,4 @@
+using Coffee.UIExtensions;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
@@ -8,20 +9,34 @@ namespace Util
 {
     public static class UIAnimations
     {
-        public static void PopupFadeIn(Image bg, RectTransform popup, float fadeTime)
+        public static void PopupFadeIn(RectTransform popup, float fadeTime)
         {
-            bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 0f);
-            popup.transform.localPosition = new Vector3(-2000f, 0, 0);
+            popup.transform.localPosition = new Vector3(-3100, 0, 0);
             popup.DOAnchorPos(new Vector2(0, 0), fadeTime).SetEase(Ease.InOutQuint);
-            bg.DOFade(0.85f, fadeTime);
         }
-
-        public static void PopupFadeOut(Image bg, RectTransform popup, float fadeTime)
+        
+        public static void PopupFadeOut(RectTransform popup, float fadeTime)
         {
-            bg.color = new Color(bg.color.r, bg.color.g, bg.color.b, 1f);
             popup.transform.localPosition = new Vector3(0, 0, 0);
-            popup.DOAnchorPos(new Vector2(-2000, 0), fadeTime).SetEase(Ease.InOutQuint);
-            bg.DOFade(0, fadeTime);
+            popup.DOAnchorPos(new Vector2(-3100, 0), fadeTime).SetEase(Ease.InOutQuint);
+        }
+        
+        public static void PopupDissolveIn(GameObject bg, RectTransform content, float fadeTime)
+        {
+            var dissolve = bg.GetComponent<UIDissolve>();
+            DOTween.To(() => dissolve.effectFactor, x => dissolve.effectFactor = x, 0, fadeTime);
+            
+            content.transform.localPosition = new Vector3(0, 3500, 0);
+            content.DOAnchorPos(new Vector2(0, 0), fadeTime).SetEase(Ease.InOutQuint);
+        }
+        
+        public static void PopupDissolveOut(GameObject bg, RectTransform content, float fadeTime)
+        {
+            var dissolve = bg.GetComponent<UIDissolve>();
+            DOTween.To(() => dissolve.effectFactor, x => dissolve.effectFactor = x, 1, fadeTime);
+            
+            content.transform.localPosition = new Vector3(0, 0, 0);
+            content.DOAnchorPos(new Vector2(0, 3500), fadeTime).SetEase(Ease.InOutQuint);
         }
 
         public static async void MissedCircleEffect(Image bg, float effectTime)

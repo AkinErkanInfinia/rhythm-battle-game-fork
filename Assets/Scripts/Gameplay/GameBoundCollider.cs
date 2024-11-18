@@ -1,4 +1,5 @@
 using System;
+using Gameplay.LevelMechanics;
 using Managers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,11 +9,14 @@ namespace Gameplay
 {
     public class GameBoundCollider : MonoBehaviour
     {
-        public Player targetPlayer;
+        public Team owner;
         public GameObject vfxHitRed;
         public GameObject vfxHitBlue;
 
         private Image _image;
+        
+        public static event Action<Team> NormalDamageTaken;
+        public static event Action<Team> MissileDamageTaken;
 
         private void Start()
         {
@@ -21,21 +25,12 @@ namespace Gameplay
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.TryGetComponent<Circle>(out var circle))
-            {
-                PlayHitVfx(other.ClosestPoint(transform.position));
-                
-                circle.PlayMissedSound();
-                GameManager.SpawnedCircles.Remove(circle.gameObject);
-                Destroy(circle.gameObject);
-                targetPlayer.CircleMissed();
-                UIAnimations.MissedCircleEffect(_image, 0.25f);
-            }
+            
         }
 
         private void PlayHitVfx(Vector3 position)
         {
-            var prefab = targetPlayer.playerSide == PlayerSide.Blue ? vfxHitBlue : vfxHitRed;
+            var prefab = owner.playerSide == PlayerSide.Blue ? vfxHitBlue : vfxHitRed;
             var particle = Instantiate(prefab, position, Quaternion.identity);
             Destroy(particle, 1f);
         }

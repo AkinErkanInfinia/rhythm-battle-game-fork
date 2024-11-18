@@ -1,63 +1,99 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Gameplay;
+using Gameplay.LevelMechanics;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
-        [Header("Settings")]
-        public float roundTime;
-        public float betweenRoundsTime;
-        
         [Space(10)]
         [Header("References")]
-        public Player[] players;
+        public GameObject greenSpawnerParent;
+        public GameObject blueSpawnerParent;
+        public GameObject greenCircleParent;
+        public GameObject blueCircleParent;
+        public GameObject greenSpawnerPrefab;
+        public GameObject blueSpawnerPrefab;
         public Timer timer;
         public GameObject playersCanvas;
         public TextMeshProUGUI timerText;
+        public TextMeshProUGUI currentLevelText;
+        public LevelMechanicBase[] mechanics;
+        public Team greenTeam;
+        public Team blueTeam;
 
         [Space(10)] [Header("Audio")] 
-        public SoundClip prepareTimeFinished;
         public SoundClip roundTimeFinished;
         
         [Space(10)]
-        [Header("Background")]
-        public OffsetScrolling[] scrollers;
-        public GameObject leftBgParticle;
-        public GameObject rightBgParticle;
-        
-        [Space(10)]
-        [Header("Countdown Screen Popup")]
-        public GameObject popupObject;
-        public RectTransform popupBg;
-        public TextMeshProUGUI popupTitle;
-        public TextMeshProUGUI popupCountdown;
+        [Header("Game Start Popup")]
+        public GameObject startScreenBackground;
+        public RectTransform startScreenContent;
+        public TextMeshProUGUI startScreenLevelText;
+        public TextMeshProUGUI startScreenCountdown;
+        public GameObject[] highScores;
 
         [Space(10)]
-        [Header("End Screen Popup")]
-        public GameObject endScreenPopup;
-        public RectTransform endScreenBg;
-        public TextMeshProUGUI endScreenTitle;
+        [Header("Round End Popup")]
+        public RectTransform roundEndContent;
+        public TextMeshProUGUI[] roundEndLevelTexts;
 
-        public static List<GameObject> SpawnedCircles;
+        public static List<Circle> SpawnedCircles;
+        public static List<GameObject> GreenSpawners;
+        public static List<GameObject> BlueSpawners;
 
         private int _round;
-        private int _leftSideMissedCircles;
-        private int _rightSideMissedCircles;
+        private int _greenTotalScore;
+        private int _blueTotalScore;
+        private bool _isRoundStarted;
         
         private void Start()
         {
-            Timer.TimeIsUp += OnTimeIsUp;
+            greenTeam.SetTeamName("Green Team");
+            blueTeam.SetTeamName("Blue Team");
             
-            SpawnedCircles = new List<GameObject>();
-            NextRound();
+            Timer.TimeIsUp += OnTimeIsUp;
+
+            SpawnedCircles = new List<Circle>();
+            GreenSpawners = new List<GameObject>();
+            BlueSpawners = new List<GameObject>();
+            
+            CreateSpawners();
+            StartGame();
+        }
+
+        private void Update()
+        {
+            if (_isRoundStarted)
+            {
+                CheckMechanicsLoop(timer.GetCurrentGameTime());
+            }
+        }
+
+        private void CreateSpawners()
+        {
+            for (int i = 0; i < GameConfigReader.Instance.data.circleCount; i++)
+            {
+                var redSpawner = Instantiate(greenSpawnerPrefab, greenSpawnerParent.transform);
+                var blueSpawner = Instantiate(blueSpawnerPrefab, blueSpawnerParent.transform);
+
+                redSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
+                blueSpawner.transform.localScale = Vector3.one * GameConfigReader.Instance.data.circleScale;
+                
+                redSpawner.GetComponent<CircleSpawner>().team = greenTeam;
+                blueSpawner.GetComponent<CircleSpawner>().team = blueTeam;
+                
+                redSpawner.GetComponent<CircleSpawner>().circleParent = greenCircleParent;
+                blueSpawner.GetComponent<CircleSpawner>().circleParent = blueCircleParent;
+                
+                GreenSpawners.Add(redSpawner);
+                BlueSpawners.Add(blueSpawner);
+            }
         }
 
         private void OnDestroy()
@@ -67,91 +103,90 @@ namespace Managers
 
         private void OnTimeIsUp(TimerType type)
         {
-            if (type == TimerType.GetReady)
-            {
-                AudioManager.Instance.PlaySoundFXClip(prepareTimeFinished, transform);
-                return;
-            }
-            
             AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
-            if (_round == 2)
-            {
-                FinishGame();
-            }
-            else
-            {
-                SwapRoles();
-                NextRound();
-            }
+            if (_round == 5) { IncreaseSpeed(); }
+            if (_round == 6) { FinishGame(); }
+            else { NextRound(); }
+        }
+
+        private void IncreaseSpeed()
+        {
+            Time.timeScale += 1f;
+            _round++;
         }
 
         private async void NextRound()
         {
             _round++;
-            
-            var title = _round == 1 ? "Get Ready!" : "Next Round!";
-            popupTitle.text = title;
-            UIAnimations.PopupFadeIn(popupObject.GetComponent<Image>(), popupBg, 1f);
+            _isRoundStarted = false;
 
+            UpdateLevelTexts();
             ClearAllCirclesOnTheBoard();
+            UIAnimations.PopupFadeIn(roundEndContent, 1f);
             playersCanvas.SetActive(false);
-            timer.StartTimer(betweenRoundsTime, popupCountdown, TimerType.GetReady);
+            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd);
             
-            await UniTask.WaitForSeconds(betweenRoundsTime);
+            await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
             
-            UIAnimations.PopupFadeOut(popupObject.GetComponent<Image>(), popupBg, 1f);
+            UIAnimations.PopupFadeOut(roundEndContent, 1f);
             playersCanvas.SetActive(true);
-            timer.StartTimer(roundTime, timerText, TimerType.RoundEnd);
-
-            ResetAttackTime();
+            timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
+            
+            _isRoundStarted = true;
         }
 
-        private void SwapRoles()
+        private void UpdateLevelTexts()
         {
-            foreach (var player in players)
+            roundEndLevelTexts[0].text = $"LEVEL {_round}";
+            roundEndLevelTexts[1].text = $"LEVEL {_round}";
+            currentLevelText.text = $"LVL {_round}";
+        }
+
+        private async void StartGame()
+        {
+            _round++;
+            playersCanvas.SetActive(false);
+            startScreenLevelText.text = $"LVL {_round}";
+            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd, startScreenCountdown);
+            
+            await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
+
+            playersCanvas.SetActive(true);
+            timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
+            
+            UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            
+            _isRoundStarted = true;
+        }
+
+        private void CheckMechanicsLoop(int time)
+        {
+            foreach (var mechanic in mechanics)
             {
-                player.playerType = player.playerType switch
+                if (mechanic.activateMechanicAfterRound == _round)
                 {
-                    PlayerType.Attacker => PlayerType.Defender,
-                    PlayerType.Defender => PlayerType.Attacker,
-                    _ => player.playerType
-                };
-            }
-            ChangeScrollerDirection();
-        }
-
-        private void ResetAttackTime()
-        {
-            foreach (var player in players)
-            {
-                player.lastAttackTime = Time.time;
+                    mechanic.MechanicLoop(time);
+                }
             }
         }
 
         private void FinishGame()
         {
+            Time.timeScale = 1;
             ClearAllCirclesOnTheBoard();
-            foreach (var player in players)
-            {
-                if (player.playerSide == PlayerSide.Red)
-                {
-                    _leftSideMissedCircles += player.missedCircleCount;
-                }
-                else
-                {
-                    _rightSideMissedCircles += player.missedCircleCount;
-                }
+            playersCanvas.SetActive(false);
 
-                player.isGameFinished = true;
-            }
+            _greenTotalScore += greenTeam.totalScore;
+            _blueTotalScore += blueTeam.totalScore;
 
-            var winner = _leftSideMissedCircles > _rightSideMissedCircles
-                ? "Winner is <#0041FF>BLUE</color>"
-                : "Winner is <#FF000C>RED</color>";
-            if (_leftSideMissedCircles == _rightSideMissedCircles) { winner = "Tie!"; }
+            var winner = _blueTotalScore > _greenTotalScore
+                ? $"Winner is <#0041FF>{blueTeam.TeamName}</color>"
+                : $"Winner is <#FF000C>{greenTeam.TeamName}</color>";
+            if (_blueTotalScore == _greenTotalScore) { winner = "Tie!"; }
             
-            endScreenTitle.text = winner;
-            UIAnimations.PopupFadeIn(endScreenPopup.GetComponent<Image>(), endScreenBg, 1f);
+            startScreenCountdown.text = winner;
+            startScreenCountdown.fontSize = 150f;
+            UIAnimations.PopupDissolveIn(startScreenBackground, startScreenContent, 1f);
         }
 
         private void ClearAllCirclesOnTheBoard()
@@ -160,18 +195,10 @@ namespace Managers
             
             foreach (var circle in SpawnedCircles)
             {
-                Destroy(circle);
+                if (!circle) { return; }
+                
+                Destroy(circle.gameObject);
             }
-        }
-
-        private void ChangeScrollerDirection()
-        {
-            foreach (var scroller in scrollers)
-            {
-                scroller.scrollSpeed *= -1;
-            }
-            leftBgParticle.SetActive(false);
-            rightBgParticle.SetActive(true);
         }
     }
 }

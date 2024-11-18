@@ -1,45 +1,54 @@
-using System.Collections;
+using System;
+using Cysharp.Threading.Tasks;
+using Gameplay.LevelMechanics;
 using Managers;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Timeline;
+using Util;
 
 namespace Gameplay
 {
     public class CircleSpawner : MonoBehaviour
     {
-        public Player player;
+        public Team team;
         public float defenceSeconds;
-        public GameObject circleCollectedVFXRed;
-        public GameObject circleCollectedVFXBlue;
-        public GameObject circleSentVFXRed;
-        public GameObject circleSentVFXBlue;
+        public GameObject circleSentVFX;
+        public GameObject getHitVFX;
+        [HideInInspector] public GameObject circleParent;
         
-        private bool _isDefending;
         private GameObject _circle;
         private float _lastActivatedTime;
+        private ParticleSystem _particle;
+        public bool IsLocked { get; private set; }
 
         private void Start()
         { 
-            _circle = transform.Find("Circle").gameObject;
+            _particle = GetComponentInChildren<ParticleSystem>();
         }
 
-        private void OnTriggerStay2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!_isDefending) { return; }
-
             if (other.TryGetComponent<Circle>(out var circle))
             {
-                var prefab = player.playerSide == PlayerSide.Blue ? circleCollectedVFXBlue : circleCollectedVFXRed;
-                var particle = Instantiate(prefab, transform.position, Quaternion.identity);
-                var pos = particle.transform.position;
-                particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
-                Destroy(particle, 1f);
-                
-                circle.PlayCollectedSound();
-                GameManager.SpawnedCircles.Remove(circle.gameObject);
+                PlayHitVfx();
+                circle.PlayMissedSound();
+                GameManager.SpawnedCircles.Remove(circle);
+                LockSpawner(1f);
+                circle.sender.AddScore(GameConfigReader.Instance.data.circleHitEnemyWeaponPoint);
                 Destroy(circle.gameObject);
-                player.CircleCollected();
             }
+
+            if (other.TryGetComponent<Missile>(out var missile))
+            {
+                PlayHitVfx();
+                missile.sender.AddScore(GameConfigReader.Instance.data.missileDamagePoint);
+            }
+        }
+
+        private void PlayHitVfx()
+        {
+            var vfx = Instantiate(getHitVFX, transform);
+            Destroy(vfx, 0.5f);
         }
 
         public void Activate()
@@ -47,47 +56,31 @@ namespace Gameplay
             if (Time.time - _lastActivatedTime < defenceSeconds) { return; }
 
             _lastActivatedTime = Time.time;
-            switch (player.playerType)
-            {
-                case PlayerType.Attacker:
-                    Attack();
-                    break;
-                case PlayerType.Defender:
-                    Defend();
-                    break;
-            }
+            Attack();
         }
 
         private void Attack()
         {
-            var circle = Instantiate(player.circlePrefab, transform).GetComponent<Circle>();
-            circle.transform.localPosition = Vector3.zero;
-            circle.dir = player.GetDirectionVector();
-            player.lastAttackTime = Time.time;
+            var circle = Instantiate(team.circlePrefab, circleParent.transform).GetComponent<Circle>();
+            circle.transform.localPosition = transform.localPosition;
+            circle.dir = team.GetDirectionVector();
+            circle.sender = team;
             
-            GameManager.SpawnedCircles.Add(circle.gameObject);
+            GameManager.SpawnedCircles.Add(circle);
             
-            var prefab = player.playerSide == PlayerSide.Blue ? circleSentVFXBlue : circleSentVFXRed;
-            var particle = Instantiate(prefab, circle.transform.position, Quaternion.identity);
+            var particle = Instantiate(circleSentVFX, circle.transform.position, Quaternion.identity);
             var pos = particle.transform.position;
             particle.transform.position = new Vector3(pos.x, pos.y, 89.95f);
             Destroy(particle, 2f);
         }
 
-        private void Defend()
+        public async void LockSpawner(float time)
         {
-            if (_isDefending) { return; }
-
-            StartCoroutine(DefendCoroutine());
-        }
-
-        private IEnumerator DefendCoroutine()
-        {
-            _isDefending = true;
-            _circle.SetActive(true);
-            yield return new WaitForSeconds(defenceSeconds);
-            _circle.SetActive(false);
-            _isDefending = false;
+            IsLocked = true;
+            _particle.Play();
+            await UniTask.WaitForSeconds(time);
+            _particle.Stop();
+            IsLocked = false;
         }
     }
     
