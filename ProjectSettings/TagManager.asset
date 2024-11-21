@@ -7,21 +7,22 @@ TagManager:
   - Circle
   - GameBound
   - Missile
+  - CircleSpawner
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - SecondCamera
+  - CircleGreen
+  - CircleBlue
+  - CircleSpawnerGreen
+  - CircleSpawnerBlue
+  - Missile
+  - AlienGreen
+  - AlienBlue
   - 
   - 
   - 
