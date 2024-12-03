@@ -1,3 +1,6 @@
 [submodule "Assets/XMSListener"]
 	path = Assets/XMSListener
 	url = https://bitbucket.org/infiniaeng/xmslistener.git
+[submodule "Assets/GamingCore"]
+	path = Assets/GamingCore
+	url = https://bitbucket.org/infiniaeng/gamingcore.git
