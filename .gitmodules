@@ -1,0 +1,3 @@
+[submodule "Assets/XMSListener"]
+	path = Assets/XMSListener
+	url = https://bitbucket.org/infiniaeng/xmslistener.git
