@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -15,36 +19,41 @@ namespace Util
     {
         private TextMeshProUGUI _timerText;
         private float _timeRemaining;
-        private bool _isTimerRunning;
         private TimerType _currentTimerType;
 
         public static event Action<TimerType> TimeIsUp;
+        
+        private Coroutine _timerCoroutine;
 
-        private void Update()
-        {
-            if (!_isTimerRunning) { return; }
-
-            if (_timeRemaining > 0)
-            {
-                _timeRemaining -= Time.deltaTime;
-
-                if (!_timerText) { return; }
-                _timerText.text = (Mathf.FloorToInt(_timeRemaining) + 1).ToString();
-            }
-            else
-            {
-                _timeRemaining = 0;
-                _isTimerRunning = false;
-                TimeIsUp?.Invoke(_currentTimerType);
-            }
-        }
-
-        public void StartTimer(float startFrom, TimerType type, TextMeshProUGUI targetText = null)
+        public void StartTimer(float startFrom, TimerType type, TextMeshProUGUI targetText)
         {
             _timerText = targetText;
             _timeRemaining = startFrom;
-            _isTimerRunning = true;
             _currentTimerType = type;
+            if(_timerCoroutine != null)
+                StopCoroutine(_timerCoroutine);
+            _timerCoroutine = StartCoroutine(StartTimerCoroutine(startFrom, type, targetText));
+        }
+        
+        private IEnumerator StartTimerCoroutine(float startFrom, TimerType type, TextMeshProUGUI targetText)
+        {
+            _timerText = targetText;
+            _timeRemaining = startFrom;
+            _currentTimerType = type;
+            for (int i = 0; i < startFrom; i++)
+            {
+                _timerText.text = (startFrom - i).ToString();
+                yield return new WaitForSeconds(1);
+            }
+            TimeIsUp?.Invoke(type);
+        }
+        
+        
+        public void StopTimer()
+        {
+            if(_timerCoroutine != null)
+                StopCoroutine(_timerCoroutine);
+            _timeRemaining = 0;
         }
 
         public int GetCurrentGameTime()

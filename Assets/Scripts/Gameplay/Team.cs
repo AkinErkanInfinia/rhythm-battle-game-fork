@@ -1,16 +1,14 @@
-using System;
-using Managers;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Util;
 
 namespace Gameplay
 {
     public enum PlayerSide
     {
         Blue,
-        Green
+        Green,
+        Orange,
+        Purple
     }
     
     public class Team : MonoBehaviour
@@ -18,8 +16,8 @@ namespace Gameplay
         public GameObject circlePrefab;
         public PlayerSide playerSide;
         public int totalScore;
-        public TextMeshProUGUI scoreText;
-        public TextMeshProUGUI nameText;
+        public TextMeshProUGUI[] scoreTexts;
+        public TextMeshProUGUI[] nameTexts;
         
         private string _teamName;
         
@@ -31,6 +29,8 @@ namespace Gameplay
             {
                 PlayerSide.Green => Vector3.down,
                 PlayerSide.Blue => Vector3.up,
+                PlayerSide.Orange => Vector3.up,
+                PlayerSide.Purple => Vector3.down,
                 _ => Vector3.zero
             };
         }
@@ -38,13 +38,16 @@ namespace Gameplay
         public void AddScore(int score)
         {
             totalScore += score;
-            scoreText.text = totalScore.ToString();
+            foreach (var text in scoreTexts)
+                text.text = totalScore.ToString();
+            
         }
 
         public void SetTeamName(string teamName)
         {
             TeamName = teamName;
-            nameText.text = teamName;
+            foreach (var nt in nameTexts)
+                nt.text = teamName;
         }
     }
     

@@ -1,10 +1,14 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Gameplay;
 using Gameplay.LevelMechanics;
+using InfiniaGamingCore.XMS;
 using TMPro;
+using UniRx;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Util;
 
 namespace Managers
@@ -26,6 +30,8 @@ namespace Managers
         public LevelMechanicBase[] mechanics;
         public Team greenTeam;
         public Team blueTeam;
+        public Team orangeTeam;
+        public Team purpleTeam;
 
         [Space(10)] [Header("Audio")] 
         public SoundClip roundTimeFinished;
@@ -51,18 +57,57 @@ namespace Managers
         private int _greenTotalScore;
         private int _blueTotalScore;
         private bool _isRoundStarted;
-        
+
+        private int _playerCounter;
+
+        private void Awake()
+        {
+            Application.runInBackground = true;
+            Timer.TimeIsUp += OnTimeIsUp;
+        }
+
         private void Start()
         {
-            greenTeam.SetTeamName("Green Team");
-            blueTeam.SetTeamName("Blue Team");
-            
-            Timer.TimeIsUp += OnTimeIsUp;
 
             SpawnedCircles = new List<Circle>();
             GreenSpawners = new List<GameObject>();
             BlueSpawners = new List<GameObject>();
             
+            MessageBroker.Default.Receive<PlayReceivedMessage>().Subscribe(OnPlayReceived).AddTo(this);
+            MessageBroker.Default.Receive<PlayerReceivedMessage>().Subscribe(OnPlayerNameReceived).AddTo(this);
+            MessageBroker.Default.Receive<CountDownUIMessage>().Subscribe(OnCountdownReceived).AddTo(this);
+        }
+
+        private void OnPlayerNameReceived(PlayerReceivedMessage message)
+        {
+            //TODO: Implement player name received
+            _playerCounter++;
+            if (_playerCounter == 1)
+            {
+                blueTeam.SetTeamName(message.playerName);
+            }
+            else if (_playerCounter == 2)
+            {
+                orangeTeam.SetTeamName(message.playerName);
+            }
+            else if (_playerCounter == 3)
+            {
+                greenTeam.SetTeamName(message.playerName);
+            }
+            else if (_playerCounter == 4)
+            {
+                purpleTeam.SetTeamName(message.playerName);
+            }
+        }
+
+        private void OnCountdownReceived(CountDownUIMessage message)
+        {
+            timer.StartTimer(message.countDownTime, TimerType.GetReady, startScreenCountdown);
+        }
+
+        private void OnPlayReceived(PlayReceivedMessage message)
+        {
+            timer.StopTimer();
             CreateSpawners();
             StartGame();
         }
@@ -124,7 +169,7 @@ namespace Managers
             ClearAllCirclesOnTheBoard();
             UIAnimations.PopupFadeIn(roundEndContent, 1f);
             playersCanvas.SetActive(false);
-            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd);
+            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd,timerText);
             
             await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
             
@@ -147,15 +192,11 @@ namespace Managers
             _round++;
             playersCanvas.SetActive(false);
             startScreenLevelText.text = $"LVL {_round}";
-            timer.StartTimer(GameConfigReader.Instance.data.timeBetweenRounds, TimerType.RoundEnd, startScreenCountdown);
-            
-            await UniTask.WaitForSeconds(GameConfigReader.Instance.data.timeBetweenRounds);
-
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
-            UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
-            
+            //UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            startScreenBackground.GetComponent<Image>().enabled = false;
             _isRoundStarted = true;
         }
 
