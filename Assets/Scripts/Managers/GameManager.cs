@@ -15,6 +15,8 @@ namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
+        [SerializeField] private List<GameObject> playerPrefabs;
+        [SerializeField] private List<TeamScoreHolderSO> teamScoreHolders;
         [Space(10)]
         [Header("References")]
         public GameObject greenSpawnerParent;
@@ -30,8 +32,6 @@ namespace Managers
         public LevelMechanicBase[] mechanics;
         public Team greenTeam;
         public Team blueTeam;
-        public Team orangeTeam;
-        public Team purpleTeam;
 
         [Space(10)] [Header("Audio")] 
         public SoundClip roundTimeFinished;
@@ -72,32 +72,26 @@ namespace Managers
             SpawnedCircles = new List<Circle>();
             GreenSpawners = new List<GameObject>();
             BlueSpawners = new List<GameObject>();
+
+            InitTeams();
             
             MessageBroker.Default.Receive<PlayReceivedMessage>().Subscribe(OnPlayReceived).AddTo(this);
             MessageBroker.Default.Receive<PlayerReceivedMessage>().Subscribe(OnPlayerNameReceived).AddTo(this);
             MessageBroker.Default.Receive<CountDownUIMessage>().Subscribe(OnCountdownReceived).AddTo(this);
         }
 
+        private void InitTeams()
+        {
+            blueTeam.SetScoreHolder(teamScoreHolders[0]);
+            greenTeam.SetScoreHolder(teamScoreHolders[1]);
+        }
+
         private void OnPlayerNameReceived(PlayerReceivedMessage message)
         {
-            //TODO: Implement player name received
+            teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
+            Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
+
             _playerCounter++;
-            if (_playerCounter == 1)
-            {
-                blueTeam.SetTeamName(message.playerName);
-            }
-            else if (_playerCounter == 2)
-            {
-                orangeTeam.SetTeamName(message.playerName);
-            }
-            else if (_playerCounter == 3)
-            {
-                greenTeam.SetTeamName(message.playerName);
-            }
-            else if (_playerCounter == 4)
-            {
-                purpleTeam.SetTeamName(message.playerName);
-            }
         }
 
         private void OnCountdownReceived(CountDownUIMessage message)
@@ -217,8 +211,8 @@ namespace Managers
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
 
-            _greenTotalScore += greenTeam.totalScore;
-            _blueTotalScore += blueTeam.totalScore;
+            _blueTotalScore += teamScoreHolders[0].GetScore();
+            _greenTotalScore += teamScoreHolders[1].GetScore();
 
             var winner = _blueTotalScore > _greenTotalScore
                 ? $"Winner is <#0041FF>{blueTeam.TeamName}</color>"
