@@ -195,8 +195,8 @@ namespace Managers
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
-            //UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
-            startScreenBackground.GetComponent<Image>().enabled = false;
+            UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            //startScreenBackground.GetComponent<Image>().enabled = false;
             _isRoundStarted = true;
         }
 
