@@ -17,6 +17,7 @@ namespace Managers
     {
         [SerializeField] private List<GameObject> playerPrefabs;
         [SerializeField] private List<TeamScoreHolderSO> teamScoreHolders;
+        [SerializeField] private List<GameObject> footImgs;
         [Space(10)]
         [Header("References")]
         public GameObject greenSpawnerParent;
@@ -88,6 +89,9 @@ namespace Managers
 
         private void OnPlayerNameReceived(PlayerReceivedMessage message)
         {
+            if (_playerCounter >= playerPrefabs.Count)
+                return;
+
             teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
             Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
 
@@ -190,6 +194,7 @@ namespace Managers
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
             UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            footImgs.ForEach(foot => foot.SetActive(false));
             //startScreenBackground.GetComponent<Image>().enabled = false;
             _isRoundStarted = true;
         }
