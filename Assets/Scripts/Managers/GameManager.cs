@@ -92,6 +92,7 @@ namespace Managers
             if (_playerCounter >= playerPrefabs.Count)
                 return;
 
+            footImgs[_playerCounter].SetActive(true);
             teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
             Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
 
@@ -193,9 +194,9 @@ namespace Managers
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
             
-            UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
+            //UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
             footImgs.ForEach(foot => foot.SetActive(false));
-            //startScreenBackground.GetComponent<Image>().enabled = false;
+            startScreenBackground.SetActive(false);
             _isRoundStarted = true;
         }
 
