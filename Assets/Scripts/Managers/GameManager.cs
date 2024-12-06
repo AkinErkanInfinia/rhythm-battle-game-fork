@@ -18,6 +18,7 @@ namespace Managers
         [SerializeField] private List<GameObject> playerPrefabs;
         [SerializeField] private List<TeamScoreHolderSO> teamScoreHolders;
         [SerializeField] private List<GameObject> footImgs;
+        [SerializeField] private GameObject endgameCanvas;
         [Space(10)]
         [Header("References")]
         public GameObject greenSpawnerParent;
@@ -43,7 +44,6 @@ namespace Managers
         public RectTransform startScreenContent;
         public TextMeshProUGUI startScreenLevelText;
         public TextMeshProUGUI startScreenCountdown;
-        public GameObject[] highScores;
 
         [Space(10)]
         [Header("Round End Popup")]
@@ -54,9 +54,9 @@ namespace Managers
         public static List<GameObject> GreenSpawners;
         public static List<GameObject> BlueSpawners;
 
+        private List<GameObject> players = new List<GameObject>();
+
         private int _round;
-        private int _greenTotalScore;
-        private int _blueTotalScore;
         private bool _isRoundStarted;
 
         private int _playerCounter;
@@ -94,8 +94,8 @@ namespace Managers
 
             footImgs[_playerCounter].SetActive(true);
             teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
-            Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
-
+            GameObject go = Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
+            players.Add(go);
             _playerCounter++;
         }
 
@@ -216,18 +216,20 @@ namespace Managers
             Time.timeScale = 1;
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
+            endgameCanvas.SetActive(true);
 
-            _blueTotalScore += teamScoreHolders[0].GetScore();
-            _greenTotalScore += teamScoreHolders[1].GetScore();
+            TeamScoreHolderSO winnerTeam;
 
-            var winner = _blueTotalScore > _greenTotalScore
-                ? $"Winner is <#0041FF>{blueTeam.TeamName}</color>"
-                : $"Winner is <#FF000C>{greenTeam.TeamName}</color>";
-            if (_blueTotalScore == _greenTotalScore) { winner = "Tie!"; }
+            if (teamScoreHolders[0].GetScore() > teamScoreHolders[1].GetScore())
+                winnerTeam = teamScoreHolders[0];
+            else
+                winnerTeam = teamScoreHolders[1];
             
-            startScreenCountdown.text = winner;
-            startScreenCountdown.fontSize = 150f;
-            UIAnimations.PopupDissolveIn(startScreenBackground, startScreenContent, 1f);
+            //MessageBroker.Default.Publish();
+
+            //startScreenCountdown.text = winnerTeam.GetNames()[0] + "\n" + winnerTeam.GetNames()[1];
+            //startScreenCountdown.fontSize = 150f;
+            //UIAnimations.PopupDissolveIn(startScreenBackground, startScreenContent, 1f);
         }
 
         private void ClearAllCirclesOnTheBoard()
@@ -241,5 +243,7 @@ namespace Managers
                 Destroy(circle.gameObject);
             }
         }
+
+        public List<GameObject> GetPlayers() => players;
     }
 }

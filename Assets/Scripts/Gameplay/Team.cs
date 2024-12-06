@@ -16,8 +16,6 @@ namespace Gameplay
         public TextMeshProUGUI[] scoreTexts;
         
         private TeamScoreHolderSO teamScoreHolder;
-        
-        public string TeamName { get; set; }
 
         public Vector3 GetDirectionVector()
         {

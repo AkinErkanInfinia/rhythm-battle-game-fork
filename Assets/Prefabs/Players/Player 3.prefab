@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSide: 0
   moveSpeed: 1000
-  isDebug: 0
+  isDebug: 1
 --- !u!114 &8610755431376178326
 MonoBehaviour:
   m_ObjectHideFlags: 0

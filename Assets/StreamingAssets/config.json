@@ -1,7 +1,7 @@
 {
   "circleCount": 9,
   "circleScale": 1,
-  "roundDuration": 10,
+  "roundDuration": 30,
   "timeBetweenRounds": 5,
   "circleCollisionPoint": 1,
   "circleHitEnemyWeaponPoint": 3,

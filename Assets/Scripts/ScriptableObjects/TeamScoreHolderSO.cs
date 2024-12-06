@@ -6,6 +6,7 @@ using UnityEngine;
 public class TeamScoreHolderSO : ScriptableObject
 {
     private event Action<int> intEvent;
+    private event Action<string> stringEvent;
 
     private List<string> names;
     private int currentScore;
@@ -17,24 +18,40 @@ public class TeamScoreHolderSO : ScriptableObject
         currentScore = 0;
     }
 
-    public void Subscribe(Action<int> subscriber)
+    public void SubscribeToScoreEvent(Action<int> subscriber)
     {
         intEvent += subscriber;
     }
 
-    public void Unsubscribe(Action<int> subscriber)
+    public void UnsubscribeFromScoreEvent(Action<int> subscriber)
     {
         intEvent -= subscriber;
     }
 
-    public void FireEvent(int value)
+    public void FireScoreEvent(int value)
     {
         intEvent?.Invoke(value);
+    }
+
+    public void SubscribeToNameEvent(Action<string> subscriber)
+    {
+        stringEvent += subscriber;
+    }
+
+    public void UnsubscribeFromNameEvent(Action<string> subscriber)
+    {
+        stringEvent -= subscriber;
+    }
+
+    public void FireNameEvent(string value)
+    {
+        stringEvent?.Invoke(value);
     }
 
     public void AddPlayer(string playerName)
     {
         names.Add(playerName);
+        FireNameEvent(playerName);
     }
 
     public void AddScore(int score)
@@ -44,8 +61,9 @@ public class TeamScoreHolderSO : ScriptableObject
         else
             currentScore += score;
 
-        FireEvent(currentScore);
+        FireScoreEvent(currentScore);
     }
 
     public int GetScore() => currentScore;
+    public List<string> GetNames() => names;
 }
