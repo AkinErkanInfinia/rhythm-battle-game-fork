@@ -57,8 +57,8 @@ namespace Util
 
             var w = _rectTransform.rect.width;
             var h = _rectTransform.rect.height;
-            pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
-            pos.y = Mathf.Clamp(pos.y, 0 + h, 1465 - h);
+            //pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
+            //pos.y = Mathf.Clamp(pos.y, 0 + h, 1465 - h);
             _rectTransform.anchoredPosition = pos;
         }
 
@@ -86,8 +86,8 @@ namespace Util
             }
             var w = _rectTransform.rect.width;
             var h = _rectTransform.rect.height;
-            pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
-            pos.y = Mathf.Clamp(pos.y, -1465 + h, 0 - h);
+            //pos.x = Mathf.Clamp(pos.x, -1500 + w, 1200 - w);
+            //pos.y = Mathf.Clamp(pos.y, -1465 + h, 0 - h);
             _rectTransform.anchoredPosition = pos;
         }
 

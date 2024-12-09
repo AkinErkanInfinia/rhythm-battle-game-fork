@@ -5,6 +5,7 @@ using UnityEngine;
 public class ScoreController : MonoBehaviour
 {
     [SerializeField] private TeamScoreHolderSO teamScoreHolder;
+    [SerializeField] private TeamScoreHolderSO enemyScoreHolder;
     [SerializeField] private List<TextMeshProUGUI> playerNames;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private GameObject crown;
@@ -21,6 +22,7 @@ public class ScoreController : MonoBehaviour
     private void RegisterToEvents()
     {
         teamScoreHolder.SubscribeToScoreEvent(OnNewScore);
+        enemyScoreHolder.SubscribeToScoreEvent(OnNewEnemyScore);
         teamScoreHolder.SubscribeToNameEvent(OnNewPlayer);
     }
 
@@ -41,6 +43,13 @@ public class ScoreController : MonoBehaviour
         else crown.SetActive(false);
     }
 
+    private void OnNewEnemyScore(int score)
+    {
+        if (score > enemyTeam.GetScore())
+            crown.SetActive(true);
+        else crown.SetActive(false);
+    }
+
     private void OnDestroy()
     {
         UnregisterFromEvents();
@@ -49,6 +58,7 @@ public class ScoreController : MonoBehaviour
     private void UnregisterFromEvents()
     {
         teamScoreHolder.UnsubscribeFromScoreEvent(OnNewScore);
+        enemyScoreHolder.UnsubscribeFromScoreEvent(OnNewEnemyScore);
         teamScoreHolder.UnsubscribeFromNameEvent(OnNewPlayer);
     }
 }

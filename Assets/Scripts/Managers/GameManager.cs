@@ -19,6 +19,7 @@ namespace Managers
         [SerializeField] private List<TeamScoreHolderSO> teamScoreHolders;
         [SerializeField] private List<GameObject> footImgs;
         [SerializeField] private GameObject endgameCanvas;
+        [SerializeField] private TextMeshProUGUI roundTimer;
         [Space(10)]
         [Header("References")]
         public GameObject greenSpawnerParent;
@@ -178,7 +179,8 @@ namespace Managers
             UIAnimations.PopupFadeOut(roundEndContent, 1f);
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
-            
+            StartCoroutine(RoundRoutine());
+
             _isRoundStarted = true;
         }
 
@@ -189,18 +191,36 @@ namespace Managers
             currentLevelText.text = $"LVL {_round}";
         }
 
-        private async void StartGame()
+        private void StartGame()
         {
             _round++;
             playersCanvas.SetActive(false);
             startScreenLevelText.text = $"LVL {_round}";
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
+            StartCoroutine(RoundRoutine());
             
             //UIAnimations.PopupDissolveOut(startScreenBackground, startScreenContent, 1f);
             footImgs.ForEach(foot => foot.SetActive(false));
             startScreenBackground.SetActive(false);
             _isRoundStarted = true;
+        }
+
+        private IEnumerator RoundRoutine()
+        {
+            float duration = GameConfigReader.Instance.data.roundDuration;
+
+            roundTimer.text = "00:" + duration.ToString();
+
+            while (duration > 0)
+            {
+                duration-= Time.deltaTime;
+                roundTimer.text = duration.ToString("00:00");
+
+                yield return null;
+            }
+
+            roundTimer.text = "00:00";
         }
 
         private void CheckMechanicsLoop(int time)
