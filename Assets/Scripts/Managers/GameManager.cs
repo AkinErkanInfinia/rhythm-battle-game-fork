@@ -61,6 +61,8 @@ namespace Managers
 
         private int _playerCounter;
 
+        public Action OnGameEnd;
+
         private void Awake()
         {
             Application.runInBackground = true;
@@ -95,6 +97,7 @@ namespace Managers
             footImgs[_playerCounter].SetActive(true);
             teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
             GameObject go = Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
+            teamScoreHolders[_playerCounter % 2].SetTeam(go.GetComponent<PlayerController>().playerSide);
             players.Add(go);
             _playerCounter++;
         }
@@ -216,20 +219,30 @@ namespace Managers
             Time.timeScale = 1;
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
-            endgameCanvas.SetActive(true);
+            OnGameEnd?.Invoke();
 
-            TeamScoreHolderSO winnerTeam;
+            var highScores = new XMS_Listener.HighScores
+            {
+                scores = new XMS_Listener.Score[teamScoreHolders.Count]
+            };
 
-            if (teamScoreHolders[0].GetScore() > teamScoreHolders[1].GetScore())
-                winnerTeam = teamScoreHolders[0];
-            else
-                winnerTeam = teamScoreHolders[1];
-            
-            //MessageBroker.Default.Publish();
+            for (int i = 0; i < teamScoreHolders.Count; i++)
+            {
+                string secondPlayerString;
 
-            //startScreenCountdown.text = winnerTeam.GetNames()[0] + "\n" + winnerTeam.GetNames()[1];
-            //startScreenCountdown.fontSize = 150f;
-            //UIAnimations.PopupDissolveIn(startScreenBackground, startScreenContent, 1f);
+                if (teamScoreHolders[i].GetNames().Count > 1)
+                    secondPlayerString = "-" + teamScoreHolders[i].GetNames()[1];
+                else
+                    secondPlayerString = "";
+
+                highScores.scores[i] = new XMS_Listener.Score
+                {
+                    username = teamScoreHolders[i].GetNames()[0] + secondPlayerString,
+                    score = teamScoreHolders[i].GetScore()
+                };
+            }
+
+            XMS_Listener.instance.SetHighScores(highScores);
         }
 
         private void ClearAllCirclesOnTheBoard()

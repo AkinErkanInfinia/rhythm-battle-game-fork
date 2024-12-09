@@ -1,3 +1,4 @@
+using Gameplay;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,7 @@ public class TeamScoreHolderSO : ScriptableObject
 
     private List<string> names;
     private int currentScore;
-    private bool isDouble = false;
+    private PlayerSide side;
 
     private void OnEnable()
     {
@@ -56,14 +57,17 @@ public class TeamScoreHolderSO : ScriptableObject
 
     public void AddScore(int score)
     {
-        if (isDouble)
-            currentScore += (score * 2);
-        else
-            currentScore += score;
+        currentScore += score;
 
         FireScoreEvent(currentScore);
     }
 
+    public void SetTeam(PlayerSide side)
+    {
+        this.side = side;
+    }
+
     public int GetScore() => currentScore;
     public List<string> GetNames() => names;
+    public PlayerSide GetSide() => side;
 }

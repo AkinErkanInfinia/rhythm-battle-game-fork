@@ -1141,7 +1141,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23e239d3e8a687d4d84974ecbfecd931, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highScoreTexts: []
+  highScoreTexts:
+  - {fileID: 1845432154350900123}
+  - {fileID: 4137544455033208226}
+  - {fileID: 2578537017836758168}
+  - {fileID: 4731885172171830489}
+  - {fileID: 4829146744045145545}
+  - {fileID: 3832437427915552665}
+  - {fileID: 3105763945915454990}
+  - {fileID: 1975507947253100131}
+  - {fileID: 3306033467848703322}
+  - {fileID: 6084501536088956798}
+  - {fileID: 8051524838691615133}
+  - {fileID: 9146425280953338719}
+  - {fileID: 3828812463779190420}
+  - {fileID: 8537633760691817431}
 --- !u!1 &2749668348945036901
 GameObject:
   m_ObjectHideFlags: 0
