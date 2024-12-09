@@ -1,6 +1,8 @@
+using InfiniaGamingCore.XMS;
 using Managers;
 using System.Collections.Generic;
 using TMPro;
+using UniRx;
 using UnityEngine;
 
 public class PostGameUI : MonoBehaviour
@@ -9,8 +11,8 @@ public class PostGameUI : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameObject uiToActivate;
 
-    [SerializeField] private TextMeshProUGUI winnerTeamName;
-    [SerializeField] private TextMeshProUGUI winnerTeamScore;
+    [SerializeField] private TextMeshProUGUI bestScoreName;
+    [SerializeField] private TextMeshProUGUI bestScore;
 
     [SerializeField] private TextMeshProUGUI team1Names;
     [SerializeField] private TextMeshProUGUI team1Score;
@@ -24,6 +26,13 @@ public class PostGameUI : MonoBehaviour
     private void Start()
     {
         gameManager.OnGameEnd += OnGameEnd;
+        MessageBroker.Default.Receive<HighScoreReceivedMessage>().Subscribe(OnHighScoreReceived).AddTo(this);
+    }
+
+    private void OnHighScoreReceived(HighScoreReceivedMessage message)
+    {
+        bestScoreName.text = message.highScore.username;
+        bestScore.text = message.highScore.score.ToString();
     }
 
     private void OnGameEnd()
@@ -46,14 +55,11 @@ public class PostGameUI : MonoBehaviour
         }
 
         if (winner.GetNames().Count > 1)
-            winnerTeamName.text = winner.GetNames()[0] + "-" + winner.GetNames()[1];
+            team1Names.text = winner.GetNames()[0] + "-" + winner.GetNames()[1];
         else
-            winnerTeamName.text = winner.GetNames()[0];
+            team1Names.text = winner.GetNames()[0];
 
-        team1Names.text = winnerTeamName.text;
-
-        winnerTeamScore.text = winner.GetScore().ToString();
-        team1Score.text = winnerTeamScore.text;
+        team1Score.text = winner.GetScore().ToString();
 
         if (winner.GetSide() is Gameplay.PlayerSide.Blue)
         {
