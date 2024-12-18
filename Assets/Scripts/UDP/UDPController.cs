@@ -30,6 +30,7 @@ public class UDPController : MonoBehaviour
 
     private void HandleMovement(PlayerMovementMessage message)
     {
+        Debug.Log("pos received" + message.newPlayerData.bodyPosition);
         PlayerData playerData = message.newPlayerData;
 
         players[currentIndex].transform.position = playerData.bodyPosition;
