@@ -55,7 +55,7 @@ public class PostGameUI : MonoBehaviour
         }
 
         if (winner.GetNames().Count > 1)
-            team1Names.text = winner.GetNames()[0] + "-" + winner.GetNames()[1];
+            team1Names.text = winner.GetNames()[0] + " - " + winner.GetNames()[1];
         else
             team1Names.text = winner.GetNames()[0];
 
@@ -81,7 +81,7 @@ public class PostGameUI : MonoBehaviour
 
 
         if (second.GetNames().Count > 1)
-            team2Names.text = second.GetNames()[0] + "-" + second.GetNames()[1];
+            team2Names.text = second.GetNames()[0] + " - " + second.GetNames()[1];
         else
             team2Names.text = second.GetNames()[0];
 

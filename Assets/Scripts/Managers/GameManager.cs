@@ -78,8 +78,8 @@ namespace Managers
             BlueSpawners = new List<GameObject>();
 
             InitTeams();
-            
-            MessageBroker.Default.Receive<PlayReceivedMessage>().Subscribe(OnPlayReceived).AddTo(this);
+
+            GameConfigReader.Instance.OnGameStart += OnPlayReceived;
             MessageBroker.Default.Receive<PlayerReceivedMessage>().Subscribe(OnPlayerNameReceived).AddTo(this);
             MessageBroker.Default.Receive<CountDownUIMessage>().Subscribe(OnCountdownReceived).AddTo(this);
         }
@@ -109,7 +109,7 @@ namespace Managers
             timer.StartTimer(message.countDownTime, TimerType.GetReady, startScreenCountdown);
         }
 
-        private void OnPlayReceived(PlayReceivedMessage message)
+        private void OnPlayReceived()
         {
             timer.StopTimer();
             CreateSpawners();
@@ -148,6 +148,8 @@ namespace Managers
         private void OnDestroy()
         {
             Timer.TimeIsUp -= OnTimeIsUp;
+
+            GameConfigReader.Instance.OnGameStart -= OnPlayReceived;
         }
 
         private void OnTimeIsUp(TimerType type)
@@ -160,7 +162,7 @@ namespace Managers
 
         private void IncreaseSpeed()
         {
-            Time.timeScale += 1f;
+            //Time.timeScale += 1f;
             _round++;
         }
 
