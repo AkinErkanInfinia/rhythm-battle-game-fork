@@ -105,6 +105,7 @@ namespace Managers
 
         private void OnCountdownReceived(CountDownUIMessage message)
         {
+            startScreenCountdown.gameObject.SetActive(true);
             timer.StartTimer(message.countDownTime, TimerType.GetReady, startScreenCountdown);
         }
 
