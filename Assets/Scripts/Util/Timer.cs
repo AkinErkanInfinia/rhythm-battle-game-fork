@@ -37,13 +37,14 @@ namespace Util
         
         private IEnumerator StartTimerCoroutine(float startFrom, TimerType type, TextMeshProUGUI targetText)
         {
+            Debug.Log("Timer started");
             _timerText = targetText;
             _timeRemaining = startFrom;
             _currentTimerType = type;
             for (int i = 0; i < startFrom; i++)
             {
                 _timerText.text = (startFrom - i).ToString();
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSecondsRealtime(1);
             }
             TimeIsUp?.Invoke(type);
         }

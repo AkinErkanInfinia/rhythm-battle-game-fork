@@ -154,6 +154,10 @@ namespace Managers
 
         private void OnTimeIsUp(TimerType type)
         {
+            if (type is TimerType.GetReady)
+                return;
+
+            Debug.Log("Time is up Round: " + _round);
             AudioManager.Instance.PlaySoundFXClip(roundTimeFinished, transform);
             if (_round == 5) { IncreaseSpeed(); }
             if (_round == 6) { FinishGame(); }
@@ -240,6 +244,7 @@ namespace Managers
         private void FinishGame()
         {
             Time.timeScale = 1;
+            Debug.Log("Game Finished Time: " + Time.time);
             ClearAllCirclesOnTheBoard();
             playersCanvas.SetActive(false);
             OnGameEnd?.Invoke();
