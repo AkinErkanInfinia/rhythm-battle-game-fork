@@ -96,9 +96,9 @@ namespace Managers
                 return;
 
             footImgs[_playerCounter].SetActive(true);
-            teamScoreHolders[_playerCounter % 2].AddPlayer(message.playerName);
+            teamScoreHolders[_playerCounter].AddPlayer(message.playerName);
             GameObject go = Instantiate(playerPrefabs[_playerCounter], playersCanvas.transform);
-            teamScoreHolders[_playerCounter % 2].SetTeam(go.GetComponent<PlayerController>().playerSide);
+            teamScoreHolders[_playerCounter].SetTeam(go.GetComponent<PlayerController>().playerSide);
             players.Add(go);
             _playerCounter++;
         }

@@ -31,8 +31,8 @@ namespace Gameplay
         {
             teamScoreHolder.AddScore(score);
 
-            foreach (var text in scoreTexts)
-                text.text = teamScoreHolder.GetScore().ToString();
+            //foreach (var text in scoreTexts)
+            //    text.text = teamScoreHolder.GetScore().ToString();
         }
 
         public void SetScoreHolder(TeamScoreHolderSO scoreHolder)

@@ -36,7 +36,7 @@ public class ScoreController : MonoBehaviour
 
     private void OnNewScore(int score)
     {
-        scoreText.text = score.ToString();
+        scoreText.text = score.ToString("D4");
 
         if (score > enemyTeam.GetScore())
             crown.SetActive(true);

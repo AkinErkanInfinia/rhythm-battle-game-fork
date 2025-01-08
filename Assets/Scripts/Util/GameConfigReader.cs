@@ -26,16 +26,16 @@ namespace Util
             }
             Instance = this;
 
-            data = new GameConfigData
-            {
-                circleCount = 9,
-                circleScale = 1,
-                roundDuration = (int)44,
-                timeBetweenRounds = (int)5,
-                circleCollisionPoint = 1,
-                circleHitEnemyWeaponPoint = 3,
-                missileDamagePoint = 1
-            };
+            //data = new GameConfigData
+            //{
+            //    circleCount = 9,
+            //    circleScale = 1,
+            //    roundDuration = (int)44,
+            //    timeBetweenRounds = (int)5,
+            //    circleCollisionPoint = 1,
+            //    circleHitEnemyWeaponPoint = 3,
+            //    missileDamagePoint = 1
+            //};
         }
 
         private void Start()
@@ -51,17 +51,20 @@ namespace Util
 
             float roundTime = (duration - totalWaitTime) / numberOfRounds;
 
+            Debug.Log("Total Game Time: " + (roundTime* numberOfRounds + totalWaitTime));
+
+
             data = new GameConfigData
             {
-                circleCount = 9,
-                circleScale = 1,
+                circleCount = 5,
+                circleScale = 2,
                 roundDuration = (int)roundTime,
                 timeBetweenRounds = (int)waitTime,
                 circleCollisionPoint = 1,
                 circleHitEnemyWeaponPoint = 3,
                 missileDamagePoint = 1
             };
-
+            Debug.Log("Game Started Time " + Time.time);
             OnGameStart?.Invoke();
         }
 
