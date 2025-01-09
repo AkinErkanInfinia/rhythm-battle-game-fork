@@ -34,7 +34,8 @@ namespace Util
                 timeBetweenRounds = (int)5,
                 circleCollisionPoint = 1,
                 circleHitEnemyWeaponPoint = 3,
-                missileDamagePoint = 1
+                missileDamagePoint = 1,
+                gameDuration = 240
             };
         }
 
@@ -59,7 +60,8 @@ namespace Util
                 timeBetweenRounds = (int)waitTime,
                 circleCollisionPoint = 1,
                 circleHitEnemyWeaponPoint = 3,
-                missileDamagePoint = 1
+                missileDamagePoint = 1,
+                gameDuration = (int)duration
             };
 
             OnGameStart?.Invoke();
@@ -122,6 +124,7 @@ namespace Util
             public int circleCollisionPoint;
             public int circleHitEnemyWeaponPoint;
             public int missileDamagePoint;
+            public int gameDuration;
         }
     }
 }
