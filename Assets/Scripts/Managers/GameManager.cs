@@ -186,7 +186,6 @@ namespace Managers
             UIAnimations.PopupFadeOut(roundEndContent, 1f);
             playersCanvas.SetActive(true);
             timer.StartTimer(GameConfigReader.Instance.data.roundDuration, TimerType.RoundEnd, timerText);
-            StartCoroutine(RoundRoutine());
 
             _isRoundStarted = true;
         }
@@ -215,19 +214,25 @@ namespace Managers
 
         private IEnumerator RoundRoutine()
         {
-            float duration = GameConfigReader.Instance.data.roundDuration;
+            float duration = GameConfigReader.Instance.data.gameDuration;
+            int minute;
+            int seconds;
 
             roundTimer.text = "00:" + duration.ToString();
 
             while (duration > 0)
             {
-                duration-= Time.deltaTime;
-                roundTimer.text = duration.ToString("00:00");
+                duration -= Time.deltaTime;
+                minute = (int)(duration / 60);
+                seconds = (int)(duration % 60);
+                roundTimer.text = minute.ToString("00") + ":" + seconds.ToString("00");
 
                 yield return null;
             }
 
             roundTimer.text = "00:00";
+
+            OnTimeIsUp(TimerType.RoundEnd);
         }
 
         private void CheckMechanicsLoop(int time)
