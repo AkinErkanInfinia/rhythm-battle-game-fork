@@ -9,8 +9,14 @@ public class SkyboxController : MonoBehaviour
     [SerializeField] private float exposureDuration = 2f;
     [SerializeField] private Vector2 exposureThresholds;
 
+    private float defaultExposure;
+    private float rotation;
+
     private void Start()
     {
+        defaultExposure = skyboxMaterial.GetFloat("_Exposure");
+        rotation = skyboxMaterial.GetFloat("_Rotation");
+
         StartCoroutine(RotateSkybox());
         StartCoroutine(SkyboxExposure());
     }
@@ -43,5 +49,11 @@ public class SkyboxController : MonoBehaviour
         yield return new WaitForSeconds(exposureDuration);
 
         StartCoroutine(SkyboxExposure());
+    }
+
+    private void OnDestroy()
+    {
+        skyboxMaterial.SetFloat("_Exposure", defaultExposure);
+        skyboxMaterial.SetFloat("_Rotation", rotation);
     }
 }
