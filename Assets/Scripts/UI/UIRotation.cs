@@ -3,6 +3,7 @@ using UnityEngine;
 public class UIRotation : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 5f; // Rotation speed in degrees per second
+    [SerializeField] private bool isRotateY;
 
     private bool isRotating = true; // Flag to control whether the object is rotating
 
@@ -15,7 +16,10 @@ public class UIRotation : MonoBehaviour
             float rotationStep = rotationSpeed * Time.deltaTime;
 
             // Apply the rotation to the Z axis
-            transform.Rotate(0, 0, rotationStep);
+            if(!isRotateY)
+                transform.Rotate(0, 0, rotationStep);
+            else
+                transform.Rotate(0, rotationStep, 0);
         }
     }
 

@@ -57,12 +57,13 @@ namespace Util
             data = new GameConfigData
             {
                 circleCount = 5,
-                circleScale = 2,
+                circleScale = 1.5f,
                 roundDuration = (int)roundTime,
                 timeBetweenRounds = (int)waitTime,
                 circleCollisionPoint = 1,
                 circleHitEnemyWeaponPoint = 3,
-                missileDamagePoint = 1
+                missileDamagePoint = 1,
+                gameDuration = (int)duration
             };
             Debug.Log("Game Started Time " + Time.time);
             OnGameStart?.Invoke();
@@ -125,6 +126,8 @@ namespace Util
             public int circleCollisionPoint;
             public int circleHitEnemyWeaponPoint;
             public int missileDamagePoint;
+            public int gameDuration;
+
         }
     }
 }
